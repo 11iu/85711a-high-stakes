@@ -1,92 +1,295 @@
+#include "autons.hpp"
+#include "display/lv_misc/lv_color.h"
 #include "main.h"
+#include "pros/adi.hpp"
+#include "pros/llemu.hpp"
+#include "pros/misc.h"
+#include "pros/misc.hpp"
+#include "pros/rtos.hpp"
 
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
+///////////////////////////////////////////////////
+// Chassis
+///////////////////////////////////////////////////
+
+pros::Controller master(pros::E_CONTROLLER_MASTER);
+
+//  chassis motors
+pros::Motor lF(LEFT_FRONT_LOWER_PORT, pros::E_MOTOR_GEARSET_06, true);
+pros::Motor lM(LEFT_FRONT_UPPER_PORT, pros::E_MOTOR_GEARSET_06, false);
+pros::Motor lB(LEFT_BACK_PORT, pros::E_MOTOR_GEARSET_06, true);
+pros::Motor rF(RIGHT_FRONT_LOWER_PORT, pros::E_MOTOR_GEARSET_06, false);
+pros::Motor rM(RIGHT_FRONT_UPPER_PORT, pros::E_MOTOR_GEARSET_06, true);
+pros::Motor rB(RIGHT_BACK_PORT, pros::E_MOTOR_GEARSET_06, false);
+
+pros::MotorGroup leftMotors({lF, lM,
+							 lB}); // Creates a motor group with forwards ports
+pros::MotorGroup rightMotors({rF, rM,
+							  rB}); // Creates a motor group with forwards port
+
+// Inertial Sensor
+pros::Imu imu(IMU_PORT);
+
+// drivetrain settings
+lemlib::Drivetrain drivetrain(
+	&leftMotors,				// left motor group
+	&rightMotors,				// right motor group
+	12,							// 12 inch track width (left to right wheels)
+	lemlib::Omniwheel::NEW_325, // using new 3.25" omnis
+	360,						// drivetrain rpm is 360
+	8							// chase power is 2. If we had traction wheels, it would have been 8
+);
+
+lemlib::ControllerSettings
+	linearController(15,  // proportional gain (kP) 20 works
+					 0,	  // integral gain (kI)
+					 4,	  // derivative gain (kD) 4 works
+					 3,	  // anti windup
+					 1,	  // small error range, in inches
+					 100, // small error range timeout, in milliseconds
+					 3,	  // large error range, in inches
+					 500, // large error range timeout, in milliseconds
+					 40	  // maximum acceleration (slew)
+	);
+
+// angular motion controller
+lemlib::ControllerSettings
+	angularController(2,   // proportional gain (kP) 3 works
+					  0,   // integral gain (kI)
+					  10,  // derivative gain (kD) 15 works
+					  3,   // anti windup
+					  2,   // small error range, in degrees
+					  100, // small error range timeout, in milliseconds
+					  3,   // large error range, in degrees
+					  500, // large error range timeout, in milliseconds
+					  0	   // maximum acceleration (slew)
+	);
+
+// sensors for odometry
+// note that in this example we use internal motor encoders (IMEs), so we don't
+// pass vertical tracking wheels
+lemlib::OdomSensors sensors(
+	nullptr, // vertical tracking wheel 1, set to null
+	nullptr, // vertical tracking wheel 2, set to nullptr as we are using IMEs
+	nullptr, // horizontal tracking wheel 1
+	nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a
+			 // second one
+	&imu	 // inertial sensor
+);
+
+lemlib::Chassis chassis(drivetrain, linearController, angularController,
+						sensors);
+
+pros::ADILed leds(LED_PORT, LED_LENGTH);
+
+Autons autons(chassis);
+
+struct Auto
+{
+	std::string name;
+	std::function<void()> function;
+	int color;
+};
+
+Auto autoDisabledAuton{"Disabled", std::bind(&Autons::autoDisabled, autons), 0x000000};
+
+std::vector<Auto> autos = {autoDisabledAuton};
+int currentAuto = 1;
+
+///////////////////////////////////////////////////
+// Utility Functions
+///////////////////////////////////////////////////
+
+double logDrive(double v, double pow)
+{
+	if (v > 0)
+	{
+		return (std::pow(std::abs(v), pow) / std::pow(127, pow)) * 127;
+	}
+	else
+	{
+		return -1 * (std::pow(std::abs(v), pow) / std::pow(127, pow)) * 127;
 	}
 }
 
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
-void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
-
-	pros::lcd::register_btn1_cb(on_center_button);
+void set_braking(bool brakeCoast = true)
+{
+	if (brakeCoast)
+	{
+		leftMotors.set_brake_modes(pros::E_MOTOR_BRAKE_COAST);
+		rightMotors.set_brake_modes(pros::E_MOTOR_BRAKE_COAST);
+	}
+	else
+	{
+		leftMotors.set_brake_modes(pros::E_MOTOR_BRAKE_BRAKE);
+		rightMotors.set_brake_modes(pros::E_MOTOR_BRAKE_BRAKE);
+	}
 }
 
-/**
- * Runs while the robot is in the disabled state of Field Management System or
- * the VEX Competition Switch, following either autonomous or opcontrol. When
- * the robot is enabled, this task will exit.
- */
-void disabled() {}
+void pgUp()
+{
+	currentAuto++;
+	if (currentAuto > autos.size() - 1)
+		currentAuto = 0;
+	pros::lcd::print(0, "%s", autos[currentAuto].name);
+	leds.set_all(autos[currentAuto].color);
+}
 
-/**
- * Runs after initialize(), and before autonomous when connected to the Field
- * Management System or the VEX Competition Switch. This is intended for
- * competition-specific initialization routines, such as an autonomous selector
- * on the LCD.
- *
- * This task will exit when the robot is enabled and autonomous or opcontrol
- * starts.
- */
-void competition_initialize() {}
+void pgDown()
+{
+	currentAuto--;
+	if (currentAuto < 0)
+		currentAuto = autos.size() - 1;
+	pros::lcd::print(0, "%s", autos[currentAuto].name);
+	leds.set_all(autos[currentAuto].color);
+}
 
-/**
- * Runs the user autonomous code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the autonomous
- * mode. Alternatively, this function may be called in initialize or opcontrol
- * for non-competition testing purposes.
- *
- * If the robot is disabled or communications is lost, the autonomous task
- * will be stopped. Re-enabling the robot will restart the task, not re-start it
- * from where it left off.
- */
-void autonomous() {}
+/* LED SHIT */
+void flashing_seizure(void *param)
+{
+	while (true)
+	{
+		leds.set_all(0xFFFFFF);
+		pros::delay(80);
+		leds.clear_all();
+		pros::delay(80);
+	}
+}
 
-/**
- * Runs the operator control code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the operator
- * control mode.
- *
- * If no competition control is connected, this function will run immediately
- * following initialize().
- *
- * If the robot is disabled or communications is lost, the
- * operator control task will be stopped. Re-enabling the robot will restart the
- * task, not resume it from where it left off.
- */
-void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
+void sequential_individual(void *param)
+{
+	uint32_t start = pros::millis();
+	leds.clear_all();
 
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
+	while (true)
+	{
+		uint32_t current = pros::millis();
+		if (current - start > 60000)
+		{
+			leds.clear_all();
+			start = current;
+		}
+		else
+		{
+			leds[(current - start) / 1000] = 0x0000FF;
+			leds.update();
+		}
+	}
+}
 
-		left_mtr = left;
-		right_mtr = right;
+void bouncy(void *param)
+{
+	int start = 0;
+	bool forwards = true;
+	int size = 15;
+	int last = -1;
+
+	// initial lit up
+	for (int i = 0; i < size; i++)
+	{
+		leds[i] = 0x0000FF;
+		last++;
+	}
+
+	while (true)
+	{
+
+		if (forwards)
+		{
+			if (last == LED_LENGTH - 1)
+			{
+				forwards = false;
+				last = LED_LENGTH - size;
+			}
+			else
+			{
+				leds[last + 1] = 0x0000FF;
+				leds[last - size + 1] = 0x000000;
+				leds.update();
+				pros::delay(30);
+				last++;
+			}
+		}
+		else
+		{
+			if (last == 0)
+			{
+				forwards = true;
+				last = size - 1;
+			}
+			else
+			{
+				leds[last - 1] = 0x0000FF;
+				leds[last + size - 1] = 0x000000;
+				leds.update();
+				pros::delay(30);
+				last--;
+			}
+		}
+	}
+}
+
+
+///////////////////////////////////////////////////
+// Main Functions
+///////////////////////////////////////////////////
+
+void initialize()
+{
+	pros::delay(500); // Stop the user from doing anything while
+					  // legacy ports configure.
+	pros::lcd::initialize();
+	chassis.calibrate();
+}
+
+void competition_initialize()
+{
+	pros::ADIDigitalIn limit_left(LEFT_BUMP);
+	pros::ADIDigitalIn limit_right(RiGHT_BUMP);
+	pros::lcd::register_btn0_cb(pgDown);
+	pros::lcd::register_btn2_cb(pgUp);
+	pros::lcd::print(0, "%s", autos[currentAuto].name);
+	leds.set_all(autos[currentAuto].color);
+
+	while (true)
+	{
+		if (limit_left.get_value())
+		{
+			pgUp();
+			pros::delay(500);
+		}
+		else if (limit_right.get_value())
+		{
+			pgDown();
+			pros::delay(500);
+		}
+		pros::delay(20);
+	}
+}
+
+void autonomous()
+{
+	leds.clear_all();
+
+	pros::Task flash_task(bouncy);
+	autos[currentAuto].function();
+}
+
+void opcontrol()
+{
+
+	leds.clear_all();
+
+	while (true)
+	{
+		// drive
+		int forward = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+		int turn = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+
+		int leftY = logDrive(forward, 3) * FORWARD_AMT;
+		int rightX = logDrive(turn, 3) * TURN_AMT;
+
+		// move the chassis with arcade drive
+		chassis.arcade(leftY, rightX);
 
 		pros::delay(20);
 	}
