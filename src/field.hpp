@@ -4,6 +4,7 @@
  * Orientation according to field.png, blue team on right side
  */
 
+/*
 struct Pose2d
 {
     float x;
@@ -69,3 +70,4 @@ Translation2d goalRightLower = Translation2d(tile, -tile);
 Translation2d goalRightUpper = Translation2d(tile, tile);
 Translation2d goalLeftLower = Translation2d(-tile, -tile);
 Translation2d goalLeftUpper = Translation2d(-tile, tile);
+*/

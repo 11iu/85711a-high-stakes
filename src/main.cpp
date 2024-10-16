@@ -1,10 +1,6 @@
 #include "autons.hpp"
 #include "main.h"
-#include "pros/adi.hpp"
-#include "pros/llemu.hpp"
-#include "pros/misc.h"
-#include "pros/misc.hpp"
-#include "pros/rtos.hpp"
+#include "field.hpp"
 
 ///////////////////////////////////////////////////
 // Chassis
@@ -13,15 +9,16 @@
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 //  chassis motors
-pros::Motor lF(LEFT_FRONT_LOWER_PORT, pros::MotorGears::green, pros::MotorEncoderUnits::degrees);
-pros::Motor lM(LEFT_FRONT_UPPER_PORT, pros::MotorGears::green, pros::MotorEncoderUnits::degrees);
-pros::Motor lB(LEFT_BACK_PORT, pros::MotorGears::green, pros::MotorEncoderUnits::degrees);
-pros::Motor rF(RIGHT_FRONT_LOWER_PORT, pros::MotorGears::green, pros::MotorEncoderUnits::degrees);
-pros::Motor rM(RIGHT_FRONT_UPPER_PORT, pros::MotorGears::green, pros::MotorEncoderUnits::degrees);
-pros::Motor rB(RIGHT_BACK_PORT, pros::MotorGears::green, pros::MotorEncoderUnits::degrees);
+pros::Motor lF(LEFT_BACK_LOWER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor lM(LEFT_BACK_UPPER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor lB(LEFT_FRONT_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor rF(RIGHT_BACK_LOWER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor rM(RIGHT_BACK_UPPER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor rB(RIGHT_FRONT_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor intake(INTAKE_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 
-pros::MotorGroup leftMotors({LEFT_FRONT_LOWER_PORT, LEFT_FRONT_UPPER_PORT, LEFT_BACK_PORT}, pros::MotorGears::green, pros::MotorEncoderUnits::degrees);
-pros::MotorGroup rightMotors({RIGHT_FRONT_LOWER_PORT, RIGHT_FRONT_UPPER_PORT, RIGHT_BACK_PORT}, pros::MotorGears::green, pros::MotorEncoderUnits::degrees);
+pros::MotorGroup leftMotors({LEFT_BACK_LOWER_PORT, LEFT_BACK_UPPER_PORT, LEFT_FRONT_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::MotorGroup rightMotors({RIGHT_BACK_LOWER_PORT, RIGHT_BACK_UPPER_PORT, RIGHT_FRONT_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 
 // Inertial Sensor
 pros::Imu imu(IMU_PORT);
@@ -30,7 +27,7 @@ pros::Imu imu(IMU_PORT);
 lemlib::Drivetrain drivetrain(
     &leftMotors,                // left motor group
     &rightMotors,               // right motor group
-    12,                         // 12 inch track width (left to right wheels)
+    12.5,                       // 12 inch track width (left to right wheels)
     lemlib::Omniwheel::NEW_325, // using new 3.25" omnis
     360,                        // drivetrain rpm is 360
     8                           // chase power is 2. If we had traction wheels, it would have been 8
@@ -76,7 +73,6 @@ lemlib::OdomSensors sensors(
 lemlib::Chassis chassis(drivetrain, linearController, angularController,
                         sensors);
 
-
 ///////////////////////////////////////////////////
 // Utility Functions
 ///////////////////////////////////////////////////
@@ -107,26 +103,44 @@ void initialize()
 
 void competition_initialize()
 {
-
 }
 
 void autonomous()
 {
-
+    // // moves in a square
+    // chassis.setPose(0, 0, 0);
+    // chassis.moveToPose(0, tile * 3, 0, 2000);
+    // chassis.moveToPose(0, tile * 3, 90, 2000);
+    // chassis.moveToPose(tile * 3, tile * 3, 90, 2000);
+    // chassis.moveToPose(tile * 3, tile * 3, 180, 2000);
+    // chassis.moveToPose(tile * 3, 0, 180, 2000);
+    // chassis.moveToPose(tile * 3, 0, -90, 2000);
+    // chassis.moveToPose(0, 0, -90, 2000);
+    // chassis.moveToPose(0, 0, 0, 2000);
 }
 
 void opcontrol()
 {
- 
+
     while (true)
     {
 
         // drive
         int forward = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int turn = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+        bool intakeSpeed = master.get_digital(pros::E_CONTROLLER_DIGITAL_R1);
 
-        int leftY = logDrive(forward, 2);
-        int rightX = logDrive(turn, 2);
+        int leftY = logDrive(forward, 3);
+        int rightX = logDrive(turn, 3);
+
+        if (intakeSpeed)
+        {
+            intake.move(127);
+        }
+        else
+        {
+            intake.move(0);
+        }
 
         // move the chassis with arcade drive
         chassis.arcade(leftY, rightX);
