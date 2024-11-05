@@ -37,9 +37,11 @@
 #include "api.h"
 
 /**
- * You should add more #includes here
+ * my includes
  */
-#include "lemlib/api.hpp"
+#include "lemlib/api.hpp" // for lemlib chassis
+#include "pros/apix.h" // for lgvl
+#include "liblvgl/lvgl.h" // for lvgl
 //#include "okapi/api.hpp"
 
 /**
