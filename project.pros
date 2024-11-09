@@ -299,7 +299,8 @@
     },
     "upload_options": {
       "icon": "alien",
-      "description": "please work"
+      "description": "please work",
+      "after": "screen"
     },
     "use_early_access": false
   }

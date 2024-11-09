@@ -1,14 +1,8 @@
 #ifndef AUTONS_HPP
 #define AUTONS_HPP
 
-#include "lemlib/api.hpp"
-
-class Autons
-{
-private:
-
-public:
-    Autons();
-};
+void auto1();
+void auto2();
+void auto3();
 
 #endif // AUTONS_HPP

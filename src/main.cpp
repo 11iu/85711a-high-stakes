@@ -1,5 +1,5 @@
-#include "autons.hpp"
 #include "main.h"
+#include "autons.hpp"
 #include "field.hpp"
 #include "global.hpp"
 
@@ -15,15 +15,66 @@ double logDrive(double v, double pow)
     }
 }
 
-static lv_obj_t * label;
+static lv_obj_t * selected_btn = NULL;
+int selected_auto = 0;
 
-static void slider_event_cb(lv_event_t * e)
-{
-    lv_obj_t * slider = lv_event_get_target(e);
+void button_handler(lv_event_t * e) {
+    lv_obj_t * btn = lv_event_get_target(e);
+    selected_auto = (int) lv_event_get_user_data(e);
 
-    /*Refresh the text*/
-    lv_label_set_text_fmt(label, "%"LV_PRId32, lv_slider_get_value(slider));
-    lv_obj_align_to(label, slider, LV_ALIGN_OUT_TOP_MID, 0, -15);    /*Align top of the slider*/
+    if (e->code == LV_EVENT_PRESSED) {
+        if (selected_btn != btn) {
+            // Deselect the previously selected button and set back to blue
+            if (selected_btn) {
+                lv_obj_clear_state(selected_btn, LV_STATE_CHECKED);
+                lv_obj_set_style_bg_color(selected_btn, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN | LV_STATE_DEFAULT); // bitwise or to combine both states
+            }
+            // Select the new button and set to red
+            selected_btn = btn;
+            lv_obj_add_state(selected_btn, LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(selected_btn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN | LV_STATE_CHECKED);
+        }
+    }
+}
+
+void auto_selector(void) {
+    lv_obj_clean(lv_scr_act());
+
+    lv_obj_t * title_auto = lv_label_create(lv_scr_act());
+    lv_label_set_text(title_auto, "Select auto:");
+    lv_obj_align(title_auto, LV_ALIGN_TOP_LEFT, 10, 10);
+
+    lv_obj_t * label_btn;
+
+    lv_obj_t * btn_auto1 = lv_btn_create(lv_scr_act());
+    lv_obj_add_event_cb(btn_auto1, button_handler, LV_EVENT_PRESSED, (void *) 1);
+    lv_obj_align(btn_auto1, LV_ALIGN_TOP_LEFT, 10, 40);
+    lv_obj_set_height(btn_auto1, LV_SIZE_CONTENT);
+    label_btn = lv_label_create(btn_auto1);
+    lv_label_set_text(label_btn, "Auto 1");
+    lv_obj_center(label_btn);
+
+    lv_obj_t * btn_auto2 = lv_btn_create(lv_scr_act());
+    lv_obj_add_event_cb(btn_auto2, button_handler, LV_EVENT_PRESSED, (void *) 2);
+    lv_obj_align(btn_auto2, LV_ALIGN_TOP_LEFT, 10, 100);
+    lv_obj_set_height(btn_auto2, LV_SIZE_CONTENT);
+    label_btn = lv_label_create(btn_auto2);
+    lv_label_set_text(label_btn, "Auto 2");
+    lv_obj_center(label_btn);
+
+    lv_obj_t * btn_auto3 = lv_btn_create(lv_scr_act());
+    lv_obj_add_event_cb(btn_auto3, button_handler, LV_EVENT_PRESSED, (void *) 3);
+    lv_obj_align(btn_auto3, LV_ALIGN_TOP_LEFT, 10, 160);
+    lv_obj_set_height(btn_auto3, LV_SIZE_CONTENT);
+    label_btn = lv_label_create(btn_auto3);
+    lv_label_set_text(label_btn, "Auto 3");
+    lv_obj_center(label_btn);
+
+    // Select the first auto by default 
+    selected_btn = btn_auto1; 
+    lv_obj_add_state(selected_btn, LV_STATE_CHECKED); 
+    lv_obj_set_style_bg_color(selected_btn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN | LV_STATE_CHECKED); 
+    selected_auto = 1;
 }
 
 void initialize()
@@ -35,19 +86,7 @@ void initialize()
 
     // lvgl stuff
     //TODO: add real time data logging (temp of motors, rings scored, time elapsed, clamp amts)
-
-    lv_obj_clean(lv_scr_act()); // clear the screen of vex crap
-
-    /*Create a slider in the center of the display*/
-    lv_obj_t * slider = lv_slider_create(lv_scr_act());
-    lv_obj_set_width(slider, 200);                          /*Set the width*/
-    lv_obj_center(slider);                                  /*Align to the center of the parent (screen)*/
-    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);     /*Assign an event function*/
-
-    /*Create a label above the slider*/
-    label = lv_label_create(lv_scr_act());
-    lv_label_set_text(label, "0");
-    lv_obj_align_to(label, slider, LV_ALIGN_OUT_TOP_MID, 0, -15);    /*Align top of the slider*/
+    auto_selector();
 }
 
 // runs after initialize and before comp switch / field control, e.g. auto selector
@@ -57,21 +96,39 @@ void competition_initialize()
 
 void autonomous()
 {
-    // // moves in a square
-    // chassis.setPose(0, 0, 0);
-    // chassis.moveToPose(0, tile * 3, 0, 2000);
-    // chassis.moveToPose(0, tile * 3, 90, 2000);
-    // chassis.moveToPose(tile * 3, tile * 3, 90, 2000);
-    // chassis.moveToPose(tile * 3, tile * 3, 180, 2000);
-    // chassis.moveToPose(tile * 3, 0, 180, 2000);
-    // chassis.moveToPose(tile * 3, 0, -90, 2000);
-    // chassis.moveToPose(0, 0, -90, 2000);
-    // chassis.moveToPose(0, 0, 0, 2000);
+    lv_obj_clean(lv_scr_act());
+
+    lv_obj_t * title_auto = lv_label_create(lv_scr_act());
+    std::string title = "Running auto " + std::to_string(selected_auto);
+    lv_label_set_text(title_auto, title.c_str());
+    lv_obj_align(title_auto, LV_ALIGN_CENTER, 0, 0);
+
+    switch (selected_auto) {
+        case 1:
+            master.set_text(0, 0, "Auto 1");
+            auto1();
+            break;
+        case 2:
+            master.set_text(0, 0, "Auto 2");
+            auto2();
+            break;
+        case 3:
+            master.set_text(0, 0, "Auto 3");
+            auto3();
+            break;
+        default:
+            break;
+    }
 }
 
 void opcontrol()
 {
-
+    lv_obj_clean(lv_scr_act());
+    lv_obj_t * title_driver = lv_label_create(lv_scr_act());
+    lv_label_set_text(title_driver, "Running driver control");
+    lv_obj_align(title_driver, LV_ALIGN_CENTER, 0, 0);
+    master.set_text(0, 0, "Driver control");
+    
     while (true)
     {
 
@@ -103,6 +160,11 @@ void opcontrol()
         {
             clamp.set_value(false);
         }
+
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
+            master.rumble("... ---");
+        }
+
 
         // move the chassis with arcade drive
         chassis.arcade(leftY, rightX);
