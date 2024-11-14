@@ -8,5 +8,5 @@ const int RIGHT_BACK_UPPER_PORT = -10;
 const int RIGHT_BACK_LOWER_PORT = 19;
 const int IMU_PORT = 9;
 const int INTAKE_PORT = 4;
-const int CLAMP_PORT = 0; // not used yet
+const char CLAMP_PORT = 'a'; // not used yet
 const int OPTICAL_PORT = 0; // not used yet

@@ -181,6 +181,7 @@ void opcontrol()
     master.set_text(0, 0, "Driver control            ");
 
     bool clampExt = false;
+    bool clampLatch = false;
     
     while (true)
     {
@@ -195,11 +196,16 @@ void opcontrol()
         master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) ? intake.move(127) : intake.move(0);
 
         // clamp toggle for double acting piston (still 1 wire signal, one solenoid is inverted)
+        (clampExt) ? clamp.set_value(HIGH) : clamp.set_value(LOW);
+        
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
         {
-            clampExt ? clamp.set_value(false) : clamp.set_value(true);
-            clampExt = !clampExt;
-            pistonNum++;
+            if (!clampLatch)  {
+                clampExt = !clampExt;
+                clampLatch = true;
+            }
+        } else {
+            clampLatch = false;
         }
 
         // move the chassis with arcade drive

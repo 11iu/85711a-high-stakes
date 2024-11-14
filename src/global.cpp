@@ -16,7 +16,7 @@ pros::MotorGroup rightMotors({RIGHT_BACK_LOWER_PORT, RIGHT_BACK_UPPER_PORT, RIGH
 
 pros::Motor intake(INTAKE_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 pros::Imu imu(IMU_PORT);
-pros::adi::DigitalOut clamp(CLAMP_PORT);
+pros::adi::DigitalOut clamp(CLAMP_PORT, LOW);
 
 lemlib::Drivetrain drivetrain(
     &leftMotors,                // left motor group
