@@ -15,6 +15,7 @@ extern pros::MotorGroup leftMotors;
 extern pros::MotorGroup rightMotors;
 extern pros::Imu imu;
 extern pros::adi::DigitalOut clamp;
+extern pros::Optical optical;
 extern lemlib::Chassis chassis;
 
 #endif

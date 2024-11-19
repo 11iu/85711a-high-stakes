@@ -4,19 +4,20 @@
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-pros::Motor lF(LEFT_BACK_LOWER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::Motor lM(LEFT_BACK_UPPER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor lF(LEFT_MIDDLE_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor lM(LEFT_BACK_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 pros::Motor lB(LEFT_FRONT_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::Motor rF(RIGHT_BACK_LOWER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::Motor rM(RIGHT_BACK_UPPER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor rF(RIGHT_MIDDLE_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor rM(RIGHT_BACK_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 pros::Motor rB(RIGHT_FRONT_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 
-pros::MotorGroup leftMotors({LEFT_BACK_LOWER_PORT, LEFT_BACK_UPPER_PORT, LEFT_FRONT_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::MotorGroup rightMotors({RIGHT_BACK_LOWER_PORT, RIGHT_BACK_UPPER_PORT, RIGHT_FRONT_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::MotorGroup leftMotors({LEFT_MIDDLE_PORT, LEFT_BACK_PORT, LEFT_FRONT_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::MotorGroup rightMotors({RIGHT_MIDDLE_PORT, RIGHT_BACK_PORT, RIGHT_FRONT_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 
 pros::Motor intake(INTAKE_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 pros::Imu imu(IMU_PORT);
 pros::adi::DigitalOut clamp(CLAMP_PORT, LOW);
+pros::Optical optical(OPTICAL_PORT);
 
 lemlib::Drivetrain drivetrain(
     &leftMotors,                // left motor group
