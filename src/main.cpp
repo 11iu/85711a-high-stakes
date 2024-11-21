@@ -4,7 +4,7 @@
 #include "global.hpp"
 
 // statistics for game
-unsigned int pistonNum = 0;
+unsigned int pistonNum = 0; // extensions only (not extensions and retractions)
 unsigned int ringNum = 0;
 
 double log_drive(double v, double pow)
@@ -82,70 +82,107 @@ void auto_selector(lv_obj_t *parent)
     selected_auto = 1;
 }
 
-void stat_display(lv_obj_t *parent)
+void motor_display(lv_obj_t *parent)
 {
     lv_obj_clean(parent);
 
-    lv_obj_t *label = lv_label_create(parent);
-    lv_label_set_text(label, "Stats");
-
     // motor name titles, horizontal on top
-    std::vector<lv_obj_t *> motor_titles(7, lv_label_create(lv_scr_act()));
+    std::vector<lv_obj_t *> motor_titles(7);
+    for (lv_obj_t *&title : motor_titles)
+    {
+        title = lv_label_create(parent);
+    }
     std::vector<std::string> motor_names = {"lF", "lM", "lB", "rF", "rM", "rB", "intake"};
     for (int i = 0; i < motor_titles.size(); i++)
     {
         lv_label_set_text(motor_titles[i], motor_names[i].c_str());
-        lv_obj_align(motor_titles[i], LV_ALIGN_TOP_LEFT, 50 * i + 30, 10);
+        lv_obj_set_pos(motor_titles[i], 50 * i + 80, 0);
     }
 
-    // stat category titles, vertical on left
-    std::vector<lv_obj_t *> stat_titles(5, lv_label_create(lv_scr_act()));
-    std::vector<std::string> stat_names = {"Temp", "Voltage", "Current", "Torque", "Connected"};
+    // motor category titles, vertical on left
+    std::vector<lv_obj_t *> stat_titles(5);
+    for (lv_obj_t *&title : stat_titles)
+    {
+        title = lv_label_create(parent);
+    }
+    std::vector<std::string> stat_names = {"Temp", "Voltage", "Current", "Torque", "Ok"};
     for (int i = 0; i < stat_titles.size(); i++)
     {
         lv_label_set_text(stat_titles[i], stat_names[i].c_str());
-        lv_obj_align(stat_titles[i], LV_ALIGN_TOP_LEFT, 0, 10 + 30 * i);
+        lv_obj_set_pos(stat_titles[i], 0, 30 * i + 30);
     }
 
-    // motor temp labels, TODO: make it red if its too high or add a bar
-    std::vector<double> motor_temps = {lF.get_temperature(), lM.get_temperature(), lB.get_temperature(), rF.get_temperature(), rM.get_temperature(), rB.get_temperature(), intake.get_temperature()};
-    std::vector<lv_obj_t *> motor_temp_titles(7, lv_label_create(lv_scr_act()));
+    // motor temp labels in decidegree celcius, TODO: make it red if its too high or add a bar
+    std::vector<int> motor_temps = {(int)(lF.get_temperature() * 10), (int)(lM.get_temperature() * 10), (int)(lB.get_temperature() * 10), (int)(rF.get_temperature() * 10), (int)(rM.get_temperature() * 10), (int)(rB.get_temperature() * 10), (int)(intake.get_temperature() * 10)};
+    std::vector<lv_obj_t *> motor_temp_titles(7);
+    for (lv_obj_t *&title : motor_temp_titles)
+    {
+        title = lv_label_create(parent);
+    }
     for (int i = 0; i < motor_titles.size(); i++)
     {
-        lv_label_set_text_fmt(motor_temp_titles[i], "%f", motor_temps[i]);
-        lv_obj_align(motor_temp_titles[i], LV_ALIGN_TOP_LEFT, 50 * i + 30, 40);
+        if (motor_temps[i] == INT_FAST32_MAX)
+            motor_temps[i] = -1; // error value, disconnected
+
+        lv_label_set_text_fmt(motor_temp_titles[i], "%d", motor_temps[i]);
+        lv_obj_set_pos(motor_temp_titles[i], 50 * i + 80, 30);
     }
 
-    // motor voltage
-    std::vector<double> motor_voltages = {lF.get_voltage() / 1000.0, lM.get_voltage() / 1000.0, lB.get_voltage() / 1000.0, rF.get_voltage() / 1000.0, rM.get_voltage() / 1000.0, rB.get_voltage() / 1000.0, intake.get_voltage() / 1000.0};
-    std::vector<lv_obj_t *> motor_voltage_titles(7, lv_label_create(lv_scr_act()));
+    // motor voltage in centivolt
+    std::vector<int> motor_voltages = {(int)(lF.get_voltage() / 10.0), (int)(lM.get_voltage() / 10.0), (int)(lB.get_voltage() / 10.0), (int)(rF.get_voltage() / 10.0), (int)(rM.get_voltage() / 10.0), (int)(rB.get_voltage() / 10.0), (int)(intake.get_voltage() / 10.0)};
+    std::vector<lv_obj_t *> motor_voltage_titles(7);
+    for (lv_obj_t *&title : motor_voltage_titles)
+    {
+        title = lv_label_create(parent);
+    }
     for (int i = 0; i < motor_titles.size(); i++)
     {
-        lv_label_set_text_fmt(motor_voltage_titles[i], "%f", motor_voltages[i]);
-        lv_obj_align(motor_voltage_titles[i], LV_ALIGN_TOP_LEFT, 50 * i + 30, 70);
+        if (motor_voltages[i] == INT_FAST32_MAX / 10)
+            motor_voltages[i] = -1; // error value, disconnected
+
+        lv_label_set_text_fmt(motor_voltage_titles[i], "%d", motor_voltages[i]);
+        lv_obj_set_pos(motor_voltage_titles[i], 50 * i + 80, 60);
     }
 
-    // motor current
-    std::vector<double> motor_currents = {lF.get_current_draw() / 1000.0, lM.get_current_draw() / 1000.0, lB.get_current_draw() / 1000.0, rF.get_current_draw() / 1000.0, rM.get_current_draw() / 1000.0, rB.get_current_draw() / 1000.0, intake.get_current_draw() / 1000.0};
-    std::vector<lv_obj_t *> motor_current_titles(7, lv_label_create(lv_scr_act()));
+    // motor current in centiamp
+    std::vector<int> motor_currents = {(int)(lF.get_current_draw() / 10.0), (int)(lM.get_current_draw() / 10.0), (int)(lB.get_current_draw() / 10.0), (int)(rF.get_current_draw() / 10.0), (int)(rM.get_current_draw() / 10.0), (int)(rB.get_current_draw() / 10.0), (int)(intake.get_current_draw() / 10.0)};
+    std::vector<lv_obj_t *> motor_current_titles(7);
+    for (lv_obj_t *&title : motor_current_titles)
+    {
+        title = lv_label_create(parent);
+    }
     for (int i = 0; i < motor_titles.size(); i++)
     {
-        lv_label_set_text_fmt(motor_current_titles[i], "%f", motor_currents[i]);
-        lv_obj_align(motor_current_titles[i], LV_ALIGN_TOP_LEFT, 50 * i + 30, 100);
+        if (motor_currents[i] == INT_FAST32_MAX / 10)
+            motor_currents[i] = -1; // error value, disconnected
+
+        lv_label_set_text_fmt(motor_current_titles[i], "%d", motor_currents[i]);
+        lv_obj_set_pos(motor_current_titles[i], 50 * i + 80, 90);
     }
 
     // motor torque
-    std::vector<double> motor_torques = {lF.get_torque(), lM.get_torque(), lB.get_torque(), rF.get_torque(), rM.get_torque(), rB.get_torque(), intake.get_torque()};
-    std::vector<lv_obj_t *> motor_torque_titles(7, lv_label_create(lv_scr_act()));
+    std::vector<int> motor_torques = {(int)lF.get_torque(), (int)lM.get_torque(), (int)lB.get_torque(), (int)rF.get_torque(), (int)rM.get_torque(), (int)rB.get_torque(), (int)intake.get_torque()};
+    std::vector<lv_obj_t *> motor_torque_titles(7);
+    for (lv_obj_t *&title : motor_torque_titles)
+    {
+        title = lv_label_create(parent);
+    }
     for (int i = 0; i < motor_titles.size(); i++)
     {
-        lv_label_set_text_fmt(motor_torque_titles[i], "%f", motor_torques[i]);
-        lv_obj_align(motor_torque_titles[i], LV_ALIGN_TOP_LEFT, 50 * i + 30, 130);
+        if (motor_torques[i] == INT_FAST32_MAX)
+            motor_torques[i] = -1; // error value, disconnected
+
+        lv_label_set_text_fmt(motor_torque_titles[i], "%d", motor_torques[i]);
+        lv_obj_set_pos(motor_torque_titles[i], 50 * i + 80, 120);
     }
 
     // motor connected
     std::vector<bool> motor_connected = {lF.is_installed(), lM.is_installed(), lB.is_installed(), rF.is_installed(), rM.is_installed(), rB.is_installed(), intake.is_installed()};
-    std::vector<lv_obj_t *> motor_connected_titles(7, lv_label_create(lv_scr_act()));
+    std::vector<lv_obj_t *> motor_connected_titles(7);
+    for (lv_obj_t *&title : motor_connected_titles)
+    {
+        title = lv_label_create(parent);
+    }
     std::vector<int> disconnected_motors;
     for (int i = 0; i < motor_titles.size(); i++)
     {
@@ -153,59 +190,102 @@ void stat_display(lv_obj_t *parent)
         {
             disconnected_motors.push_back(i);
         }
-        lv_label_set_text_fmt(motor_connected_titles[i], "%d", motor_connected[i]);
-        lv_obj_align(motor_connected_titles[i], LV_ALIGN_TOP_LEFT, 50 * i + 30, 160);
+        if (motor_connected[i])
+        {
+            lv_label_set_text(motor_connected_titles[i], "Y");
+        }
+        else
+        {
+            lv_label_set_text(motor_connected_titles[i], "N");
+        }
+        lv_obj_set_pos(motor_connected_titles[i], 50 * i + 80, 150);
     }
 
-    // vibrate controller and show disconnected motors
-    if (disconnected_motors.size() > 0)
-    {
-        master.rumble(".-.-.-");
-        std::string disconnected = "Disconnected motors: ";
-        for (int i = 0; i < disconnected_motors.size(); i++)
-        {
-            disconnected += motor_names[disconnected_motors[i]];
-            if (i != disconnected_motors.size() - 1)
-            {
-                disconnected += ", ";
-            }
-        }
-        master.set_text(0, 1, disconnected.c_str());
-    }
-    
+    // // vibrate controller and show disconnected motors
+    // if (disconnected_motors.size() > 0)
+    // {
+    //     master.rumble(".-.-.-");
+    //     std::string disconnected = "Disconnected motors: ";
+    //     for (int i = 0; i < disconnected_motors.size(); i++)
+    //     {
+    //         disconnected += motor_names[disconnected_motors[i]];
+    //         if (i != disconnected_motors.size() - 1)
+    //         {
+    //             disconnected += ", ";
+    //         }
+    //     }
+    //     master.set_text(0, 1, disconnected.c_str());
+    // }
 }
 
 void sensor_display(lv_obj_t *parent)
 {
     lv_obj_clean(parent);
 
-    lv_obj_t *label = lv_label_create(parent);
-    lv_label_set_text(label, "Sensors");
-
-    // sensor categories, horizontal on top
-    std::vector<lv_obj_t *> sensor_titles(11, lv_label_create(lv_scr_act()));
+    // Line 1: sensor categories, horizontal on top
+    std::vector<lv_obj_t *> sensor_titles(11);
+    for (lv_obj_t *&title : sensor_titles)
+    {
+        title = lv_label_create(parent);
+    }
     std::vector<std::string> sensor_names = {"Hue", "Sat", "Bright", "Prox", "Heading", "BatCurr", "BatVolt", "BatCap", "BatTemp", "EncPos", "EncVel"};
-    for (int i = 0; i < sensor_titles.size(); i++)
+    for (int i = 0; i < sensor_titles.size() / 2; i++)
     {
         lv_label_set_text(sensor_titles[i], sensor_names[i].c_str());
-        lv_obj_align(sensor_titles[i], LV_ALIGN_TOP_LEFT, 10 + 30 * i, 10);
+        lv_obj_set_pos(sensor_titles[i], 80 * i, 0);
     }
-    // optical hue, sat, bright, proximity | imu heading | battery current, voltage, capacity, temp | encoder position, velocity
-    std::vector<double> sensor_values = {optical.get_hue(), optical.get_saturation(), optical.get_brightness(),
-                                         (double)optical.get_proximity(), imu.get_heading(), pros::battery::get_current() / 1000.0, 
-                                         pros::battery::get_voltage() / 1000.0, pros::battery::get_capacity(), pros::battery::get_temperature(), 
-                                         lF.get_position(), lF.get_actual_velocity()};
 
-    for (int i = 0; i < sensor_titles.size(); i++)
+    // Line 2: sensor categories, horizontal on middle
+    for (int i = sensor_titles.size() / 2; i < sensor_titles.size(); i++)
     {
-        lv_obj_t *sensor_value = lv_label_create(lv_scr_act());
-        lv_label_set_text_fmt(sensor_value, "%f", sensor_values[i]);
-        lv_obj_align(sensor_value, LV_ALIGN_TOP_LEFT, 10 + 30 * i, 40);
+        lv_label_set_text(sensor_titles[i], sensor_names[i].c_str());
+        lv_obj_set_pos(sensor_titles[i], 80 * (i - sensor_titles.size() / 2), 90);
+    }
+
+    // optical hue, sat, bright, proximity | imu heading | battery current, voltage, capacity, temp | encoder position, velocity
+    std::vector<int> sensor_values = {(int)optical.get_hue(), (int)optical.get_saturation(), (int)optical.get_brightness(),
+                                      optical.get_proximity(), (int)imu.get_heading(), (int)(pros::battery::get_current() / 10.0),
+                                      (int)(pros::battery::get_voltage() / 10.0), (int)(pros::battery::get_capacity()), (int)(pros::battery::get_temperature() * 10.0),
+                                      (int)lF.get_position(), (int)lF.get_actual_velocity()};
+
+    for (int i = 0; i < sensor_titles.size() / 2; i++)
+    {
+        // FIXME: for battery current and voltage need to check if this is the max divided by 10
+        if (sensor_values[i] == INT_FAST32_MAX)
+            sensor_values[i] = -1; // error value, disconnected
+
+        lv_obj_t *sensor_value = lv_label_create(parent);
+        lv_label_set_text_fmt(sensor_value, "%d", sensor_values[i]);
+        lv_obj_set_pos(sensor_value, 80 * i, 25);
+    }
+
+    for (int i = sensor_titles.size() / 2; i < sensor_titles.size(); i++)
+    {
+        if (sensor_values[i] == INT_FAST32_MAX)
+            sensor_values[i] = -1; // error value, disconnected
+
+        lv_obj_t *sensor_value = lv_label_create(parent);
+        lv_label_set_text_fmt(sensor_value, "%d", sensor_values[i]);
+        lv_obj_set_pos(sensor_value, 80 * (i - sensor_titles.size() / 2), 115);
     }
 }
 
+// display during a match, piston uses, run time, emergency motor disconects, overheat
+void opcontrol_display()
+{
+    lv_obj_clean(lv_scr_act());
+    lv_obj_t *title_driver = lv_label_create(lv_scr_act());
+    lv_label_set_text(title_driver, "Running driver control");
+    lv_obj_align(title_driver, LV_ALIGN_CENTER, 0, 0);
+    master.set_text(0, 0, "Driver control            ");
+
+    // piston activations
+    lv_obj_t *piston_title = lv_label_create(lv_scr_act());
+    lv_label_set_text(piston_title, "Piston activations");
+}
+
 lv_obj_t *tab_autos;
-lv_obj_t *tab_stats;
+lv_obj_t *tab_motors;
 lv_obj_t *tab_sensors;
 
 void create_tab_view()
@@ -214,14 +294,14 @@ void create_tab_view()
     lv_obj_t *tabview = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, 30);
 
     tab_autos = lv_tabview_add_tab(tabview, "Autos");
-    tab_stats = lv_tabview_add_tab(tabview, "Statistics");
+    tab_motors = lv_tabview_add_tab(tabview, "Motors");
     tab_sensors = lv_tabview_add_tab(tabview, "Sensors");
 
     // auto tab content
     auto_selector(tab_autos);
 
     // stat tab content,  add real time data logging (temp of motors, rings scored, time elapsed, clamp amts)
-    stat_display(tab_stats);
+    motor_display(tab_motors);
 
     // sensor tab content
     sensor_display(tab_sensors);
@@ -273,18 +353,13 @@ void autonomous()
 
 void opcontrol()
 {
-    lv_obj_clean(lv_scr_act());
-    lv_obj_t *title_driver = lv_label_create(lv_scr_act());
-    lv_label_set_text(title_driver, "Running driver control");
-    lv_obj_align(title_driver, LV_ALIGN_CENTER, 0, 0);
-    master.set_text(0, 0, "Driver control            ");
 
     bool clampExt = false;
     bool clampLatch = false;
 
     while (true)
     {
-
+        // opcontrol_display(); // FIXME: do not update this as often takes too long
         // drive
         int forward = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int turn = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
