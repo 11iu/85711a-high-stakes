@@ -288,6 +288,7 @@ lv_obj_t *tab_autos;
 lv_obj_t *tab_motors;
 lv_obj_t *tab_sensors;
 
+// FIXME: need to make the variables reactive and have lvgl update, maybe create a thread for this
 void create_tab_view()
 {
 
@@ -307,6 +308,19 @@ void create_tab_view()
     sensor_display(tab_sensors);
 }
 
+// image stuff
+
+
+void lv_example_img_1(void)
+{
+    lv_obj_clean(lv_scr_act());
+    LV_IMG_DECLARE(vex_field);
+    lv_obj_t * img1 = lv_img_create(lv_scr_act());
+    lv_img_set_src(img1, &vex_field);
+    lv_obj_align(img1, LV_ALIGN_TOP_LEFT, 0, -20);
+    lv_obj_set_size(img1, 400, 200);
+}
+
 void initialize()
 {
     pros::delay(500); // Stop the user from doing anything while
@@ -316,6 +330,7 @@ void initialize()
 
     // lvgl auto selector and info display on brain
     create_tab_view();
+    // lv_example_img_1();
 }
 
 // runs after initialize and before comp switch / field control, e.g. auto selector

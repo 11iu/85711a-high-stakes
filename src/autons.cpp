@@ -4,15 +4,15 @@
 
 // goes straight
 void auto1() {
-    chassis.moveToPose(0, 24, 0, 4000);
+    chassis.moveToPose(chassis.getPose().x, chassis.getPose().y + 24, 0, 10000);
 }
 
 // turns right
 void auto2() {
-    chassis.moveToPose(0, 0, 90, 4000);
+    chassis.moveToPose(chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta + 90, 10000);
 }
 
 // turns left
 void auto3() {
-    chassis.moveToPose(0, 0, -90, 4000);
+    chassis.moveToPose(chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta - 90, 10000);
 }
