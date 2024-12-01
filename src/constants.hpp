@@ -9,4 +9,4 @@ const int RIGHT_BACK_PORT = 9;
 const int IMU_PORT = 5;
 const int INTAKE_PORT = 3;
 const char CLAMP_PORT = 'a'; // not used yet
-const int OPTICAL_PORT = 0;  // not used yet
+const int OPTICAL_PORT = 6;  // not used yet

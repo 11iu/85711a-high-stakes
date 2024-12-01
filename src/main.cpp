@@ -371,6 +371,10 @@ void opcontrol()
 
     bool clampExt = false;
     bool clampLatch = false;
+    uint32_t sort_start_time = pros::millis();
+    int continue_duration = 0; // continue belt after rejection start
+    int stop_duration = 300; // stop belt to reject after continue
+    bool in_sorting = false; // start rejection process
 
     while (true)
     {
@@ -380,9 +384,6 @@ void opcontrol()
         int turn = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         int leftY = log_drive(forward, 3);
         int rightX = log_drive(turn, 3);
-
-        // intake and belt hold R1
-        master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) ? intake.move(127) : intake.move(0);
 
         // clamp toggle for double acting piston (still 1 wire signal, one solenoid is inverted)
         (clampExt) ? clamp.set_value(HIGH) : clamp.set_value(LOW);
@@ -400,6 +401,39 @@ void opcontrol()
             clampLatch = false;
         }
 
+         // intake and belt hold R1
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+            
+            // start the rejection process
+            if (optical.get_hue() < 30 && !in_sorting)
+            {
+                sort_start_time = pros::millis();
+                in_sorting = true;
+            } else {
+                intake.move(127); // otherwise move normal
+            }
+
+            if (in_sorting && pros::millis() - sort_start_time < stop_duration)
+            {
+                if (pros::millis() - sort_start_time < continue_duration)
+                    intake.move(127);
+                else 
+                    intake.move(0);
+            }
+            else
+            {
+                in_sorting = false;
+            }
+        } else {
+            intake.move(0);
+        }
+
+        // reverse intake direction
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
+        {
+            intake.move(-127);
+        }
+            
         // move the chassis with arcade drive
         chassis.arcade(leftY, rightX);
 
