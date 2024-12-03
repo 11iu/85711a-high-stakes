@@ -17,5 +17,6 @@ extern pros::Imu imu;
 extern pros::adi::DigitalOut clamp;
 extern pros::Optical optical;
 extern lemlib::Chassis chassis;
+extern bool isBlue;
 
 #endif

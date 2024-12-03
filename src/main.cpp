@@ -45,38 +45,53 @@ void btn_handler_auto(lv_event_t *e)
     }
 }
 
+void switch_handler_auto(lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t *obj = lv_event_get_target(e);
+    if (code == LV_EVENT_VALUE_CHANGED)
+    {
+        isBlue = lv_obj_has_state(obj, LV_STATE_CHECKED); // set blue when switch is flipped
+    }
+}
+
 void auto_selector(lv_obj_t *parent)
 {
     lv_obj_clean(parent);
 
-    lv_obj_t *label_btn;
+    // red blue team color selector in the center top of the screen
+    lv_obj_t *label_red = lv_label_create(parent);
+    lv_label_set_text(label_red, "Red");
+    lv_obj_set_pos(label_red, 50, 20);
 
-    lv_obj_t *btn_auto1 = lv_btn_create(parent);
-    lv_obj_add_event_cb(btn_auto1, btn_handler_auto, LV_EVENT_PRESSED, (void *)1);
-    lv_obj_align(btn_auto1, LV_ALIGN_TOP_LEFT, 10, 10);
-    lv_obj_set_height(btn_auto1, LV_SIZE_CONTENT);
-    label_btn = lv_label_create(btn_auto1);
-    lv_label_set_text(label_btn, "Auto 1");
-    lv_obj_center(label_btn);
+    lv_obj_t *label_blue = lv_label_create(parent);
+    lv_label_set_text(label_blue, "Blue");
+    lv_obj_set_pos(label_blue, 150, 20);
 
-    lv_obj_t *btn_auto2 = lv_btn_create(parent);
-    lv_obj_add_event_cb(btn_auto2, btn_handler_auto, LV_EVENT_PRESSED, (void *)2);
-    lv_obj_align(btn_auto2, LV_ALIGN_TOP_LEFT, 10, 60);
-    lv_obj_set_height(btn_auto2, LV_SIZE_CONTENT);
-    label_btn = lv_label_create(btn_auto2);
-    lv_label_set_text(label_btn, "Auto 2");
-    lv_obj_center(label_btn);
+    lv_obj_t *sw_team = lv_switch_create(parent);
+    lv_obj_add_event_cb(sw_team, switch_handler_auto, LV_EVENT_ALL, NULL);
+    lv_obj_set_pos(sw_team, 100, 20);
 
-    lv_obj_t *btn_auto3 = lv_btn_create(parent);
-    lv_obj_add_event_cb(btn_auto3, btn_handler_auto, LV_EVENT_PRESSED, (void *)3);
-    lv_obj_align(btn_auto3, LV_ALIGN_TOP_LEFT, 10, 110);
-    lv_obj_set_height(btn_auto3, LV_SIZE_CONTENT);
-    label_btn = lv_label_create(btn_auto3);
-    lv_label_set_text(label_btn, "Auto 3");
-    lv_obj_center(label_btn);
+    // auto selector buttons horizontally aligned at the bottom
+
+    std::vector<lv_obj_t *> auto_buttons(3);
+    std::vector<lv_obj_t *> auto_labels(3);
+    std::vector<std::string> auto_names = {"Auto 1", "Auto 2", "Auto 3"};
+
+    // initialize buttons
+    for (int i = 0; i < auto_buttons.size(); i++)
+    {
+        auto_buttons[i] = lv_btn_create(parent);
+        lv_obj_add_event_cb(auto_buttons[i], btn_handler_auto, LV_EVENT_PRESSED, (void *)(i + 1));
+        lv_obj_set_pos(auto_buttons[i], 50 * i + 10, 150);
+        lv_obj_set_height(auto_buttons[i], LV_SIZE_CONTENT);
+        auto_labels[i] = lv_label_create(auto_buttons[i]);
+        lv_label_set_text(auto_labels[i], auto_names[i].c_str());
+        lv_obj_center(auto_labels[i]);
+    }
 
     // Select the first auto by default
-    selected_btn_auto = btn_auto1;
+    selected_btn_auto = auto_buttons[0];
     lv_obj_add_state(selected_btn_auto, LV_STATE_CHECKED);
     lv_obj_set_style_bg_color(selected_btn_auto, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN | LV_STATE_CHECKED);
     selected_auto = 1;
@@ -310,12 +325,11 @@ void create_tab_view()
 
 // image stuff
 
-
 void lv_example_img_1(void)
 {
     lv_obj_clean(lv_scr_act());
     LV_IMG_DECLARE(vex_field);
-    lv_obj_t * img1 = lv_img_create(lv_scr_act());
+    lv_obj_t *img1 = lv_img_create(lv_scr_act());
     lv_img_set_src(img1, &vex_field);
     lv_obj_align(img1, LV_ALIGN_TOP_LEFT, 0, -20);
     lv_obj_set_size(img1, 400, 200);
@@ -366,6 +380,12 @@ void autonomous()
     }
 }
 
+// TODO: check if the rejection for red is ok
+bool wrong_color()
+{
+    return (isBlue && optical.get_hue() < 100) || (!isBlue && optical.get_hue() > 30);
+}
+
 void opcontrol()
 {
 
@@ -373,8 +393,8 @@ void opcontrol()
     bool clampLatch = false;
     uint32_t sort_start_time = pros::millis();
     int continue_duration = 0; // continue belt after rejection start
-    int stop_duration = 300; // stop belt to reject after continue
-    bool in_sorting = false; // start rejection process
+    int stop_duration = 300;   // stop belt to reject after continue
+    bool in_sorting = false;   // start rejection process
 
     while (true)
     {
@@ -401,15 +421,18 @@ void opcontrol()
             clampLatch = false;
         }
 
-         // intake and belt hold R1
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-            
+        // intake and belt hold R1
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+        {
+
             // start the rejection process
-            if (optical.get_hue() < 30 && !in_sorting)
+            if (wrong_color() && !in_sorting)
             {
                 sort_start_time = pros::millis();
                 in_sorting = true;
-            } else {
+            }
+            else
+            {
                 intake.move(127); // otherwise move normal
             }
 
@@ -417,14 +440,16 @@ void opcontrol()
             {
                 if (pros::millis() - sort_start_time < continue_duration)
                     intake.move(127);
-                else 
+                else
                     intake.move(0);
             }
             else
             {
                 in_sorting = false;
             }
-        } else {
+        }
+        else
+        {
             intake.move(0);
         }
 
@@ -433,7 +458,7 @@ void opcontrol()
         {
             intake.move(-127);
         }
-            
+
         // move the chassis with arcade drive
         chassis.arcade(leftY, rightX);
 

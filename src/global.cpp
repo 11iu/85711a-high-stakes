@@ -63,3 +63,5 @@ lemlib::OdomSensors sensors(
 
 lemlib::Chassis chassis(drivetrain, linearController, angularController,
                         sensors);
+
+bool isBlue = false;
