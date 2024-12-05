@@ -4,6 +4,20 @@
 #include <string>
 #include <unordered_map>
 
+// Variables
+bool isBlue = false;
+
+std::unordered_map<std::string, int> ledColors = {
+    {"red", 0xFF0000},
+    {"green", 0x00FF00},
+    {"blue", 0x0000FF},
+    {"yellow", 0xFFFF00},
+    {"purple", 0x800080},
+    {"white", 0xFFFFFF},
+    {"off", 0x000000}
+};
+
+// Objects
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 pros::Motor lF(LEFT_MIDDLE_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
@@ -68,15 +82,3 @@ lemlib::OdomSensors sensors(
 
 lemlib::Chassis chassis(drivetrain, linearController, angularController,
                         sensors);
-
-bool isBlue = false;
-
-std::unordered_map<std::string, int> ledColors = {
-    {"red", 0xFF0000},
-    {"green", 0x00FF00},
-    {"blue", 0x0000FF},
-    {"yellow", 0xFFFF00},
-    {"purple", 0x800080},
-    {"white", 0xFFFFFF},
-    {"off", 0x000000}
-};

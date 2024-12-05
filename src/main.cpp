@@ -1,6 +1,5 @@
 #include "main.h"
 #include "autons.hpp"
-#include "field.hpp"
 #include "global.hpp"
 
 // statistics for game

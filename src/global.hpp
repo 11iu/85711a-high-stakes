@@ -4,6 +4,11 @@
 #ifndef __GLOBAL_HPP__
 #define __GLOBAL_HPP__
 
+// Variables
+extern bool isBlue;
+extern std::unordered_map<std::string, int> ledColors;
+
+// Objects
 extern pros::Controller master;
 extern pros::Motor lF;
 extern pros::Motor lM;
@@ -19,7 +24,5 @@ extern lemlib::Chassis chassis;
 extern pros::adi::Ultrasonic backUltra;
 extern pros::adi::Ultrasonic leftUltra;
 extern pros::adi::Led leds;
-extern bool isBlue;
-extern std::unordered_map<std::string, int> ledColors;
 
 #endif
