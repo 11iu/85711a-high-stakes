@@ -1,6 +1,8 @@
 #include "global.hpp"
 #include "main.h"
 #include "constants.hpp"
+#include <string>
+#include <unordered_map>
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
@@ -18,6 +20,9 @@ pros::Motor intake(INTAKE_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits:
 pros::Imu imu(IMU_PORT);
 pros::adi::DigitalOut clamp(CLAMP_PORT, LOW);
 pros::Optical optical(OPTICAL_PORT);
+pros::adi::Ultrasonic backUltra(B_ULTRA_OUT_PORT, B_ULTRA_IN_PORT);
+pros::adi::Ultrasonic leftUltra(L_ULTRA_OUT_PORT, L_ULTRA_IN_PORT);
+pros::adi::Led leds(LED_PORT, LED_LENGTH);
 
 lemlib::Drivetrain drivetrain(
     &leftMotors,                // left motor group
@@ -65,3 +70,13 @@ lemlib::Chassis chassis(drivetrain, linearController, angularController,
                         sensors);
 
 bool isBlue = false;
+
+std::unordered_map<std::string, int> ledColors = {
+    {"red", 0xFF0000},
+    {"green", 0x00FF00},
+    {"blue", 0x0000FF},
+    {"yellow", 0xFFFF00},
+    {"purple", 0x800080},
+    {"white", 0xFFFFFF},
+    {"off", 0x000000}
+};

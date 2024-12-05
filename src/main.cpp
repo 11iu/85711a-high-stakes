@@ -62,15 +62,16 @@ void auto_selector(lv_obj_t *parent)
     // red blue team color selector in the center top of the screen
     lv_obj_t *label_red = lv_label_create(parent);
     lv_label_set_text(label_red, "Red");
-    lv_obj_set_pos(label_red, 50, 20);
-
-    lv_obj_t *label_blue = lv_label_create(parent);
-    lv_label_set_text(label_blue, "Blue");
-    lv_obj_set_pos(label_blue, 150, 20);
+    lv_obj_set_pos(label_red, 150, 20);
 
     lv_obj_t *sw_team = lv_switch_create(parent);
     lv_obj_add_event_cb(sw_team, switch_handler_auto, LV_EVENT_ALL, NULL);
-    lv_obj_set_pos(sw_team, 100, 20);
+    lv_obj_set_pos(sw_team, 195, 12);
+
+    lv_obj_t *label_blue = lv_label_create(parent);
+    lv_label_set_text(label_blue, "Blue");
+    lv_obj_set_pos(label_blue, 260, 20);
+
 
     // auto selector buttons horizontally aligned at the bottom
 
@@ -83,7 +84,7 @@ void auto_selector(lv_obj_t *parent)
     {
         auto_buttons[i] = lv_btn_create(parent);
         lv_obj_add_event_cb(auto_buttons[i], btn_handler_auto, LV_EVENT_PRESSED, (void *)(i + 1));
-        lv_obj_set_pos(auto_buttons[i], 50 * i + 10, 150);
+        lv_obj_set_pos(auto_buttons[i], 150 * i + 35, 100);
         lv_obj_set_height(auto_buttons[i], LV_SIZE_CONTENT);
         auto_labels[i] = lv_label_create(auto_buttons[i]);
         lv_label_set_text(auto_labels[i], auto_names[i].c_str());
@@ -335,6 +336,39 @@ void lv_example_img_1(void)
     lv_obj_set_size(img1, 400, 200);
 }
 
+/* --------------- LED SHIT ------------------- */
+void flashing_seizure(void *param)
+{
+    while (true)
+    {
+        leds.set_all(0xFFFFFF);
+        pros::delay(80);
+        leds.clear_all();
+        pros::delay(80);
+    }
+}
+
+void sequential_individual(void *param)
+{
+    uint32_t start = pros::millis();
+    leds.clear_all();
+
+    while (true)
+    {
+        uint32_t current = pros::millis();
+        if (current - start > 60000)
+        {
+            leds.clear_all();
+            start = current;
+        }
+        else
+        {
+            leds[(current - start) / 1000] = 0x0000FF;
+            leds.update();
+        }
+    }
+}
+
 void initialize()
 {
     pros::delay(500); // Stop the user from doing anything while
@@ -345,6 +379,8 @@ void initialize()
     // lvgl auto selector and info display on brain
     create_tab_view();
     // lv_example_img_1();
+
+    leds.set_all(ledColors["blue"]);
 }
 
 // runs after initialize and before comp switch / field control, e.g. auto selector
@@ -360,6 +396,9 @@ void autonomous()
     std::string title = "Running auto " + std::to_string(selected_auto);
     lv_label_set_text(title_auto, title.c_str());
     lv_obj_align(title_auto, LV_ALIGN_CENTER, 0, 0);
+
+    // leds
+    pros::Task flash_task(sequential_individual);
 
     switch (selected_auto)
     {
@@ -469,4 +508,6 @@ void opcontrol()
 void disabled()
 {
     create_tab_view();
+
+    leds.set_all(ledColors["blue"]);
 }

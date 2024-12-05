@@ -4,6 +4,20 @@
  * Orientation according to field.png, blue team on right side
  */
 
+#include "main.h"
+
+using namespace lemlib;
+
+extern float tile;
+extern float fieldX;
+extern float fieldY;
+extern float ringOD;
+extern float ringID;
+extern float ringThick;
+
+extern Pose origin;
+extern Pose bottom_mogo;
+
 /*
 struct Pose2d
 {
