@@ -20,9 +20,11 @@ extern pros::Motor intake;
 extern pros::Imu imu;
 extern pros::adi::DigitalOut clamp;
 extern pros::Optical optical;
+// extern pros::Vision frontCam;
 extern lemlib::Chassis chassis;
 extern pros::adi::Ultrasonic backUltra;
 extern pros::adi::Ultrasonic leftUltra;
-extern pros::adi::Led leds;
+// extern pros::adi::Led leftLeds;
+// extern pros::adi::Led rightLeds;
 
 #endif

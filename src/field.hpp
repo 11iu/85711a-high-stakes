@@ -16,6 +16,7 @@ float ringThick = 2;
 // Starting positions
 Pose startUpper = Pose(tile * 2, tile * 1, 90);  // face the right wall
 Pose startLower = Pose(tile * 2, -tile * 1, 90); // face the right wall
+Pose startLowerFar = Pose(tile * 2.5, -tile * 2.5, -45);
 
 // Mobile goal center
 Pose mogoFarBottom = Pose(0, -tile * 2);

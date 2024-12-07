@@ -71,7 +71,6 @@ void auto_selector(lv_obj_t *parent)
     lv_label_set_text(label_blue, "Blue");
     lv_obj_set_pos(label_blue, 260, 20);
 
-
     // auto selector buttons horizontally aligned at the bottom
 
     std::vector<lv_obj_t *> auto_buttons(3);
@@ -336,13 +335,16 @@ void lv_example_img_1(void)
 }
 
 /* --------------- LED SHIT ------------------- */
+/*
 void flashing_seizure(void *param)
 {
     while (true)
     {
-        leds.set_all(0xFFFFFF);
+        leftLeds.set_all(0xFFFFFF);
+        rightLeds.set_all(0xFFFFFF);
         pros::delay(80);
-        leds.clear_all();
+        leftLeds.clear_all();
+        rightLeds.clear_all();
         pros::delay(80);
     }
 }
@@ -350,23 +352,28 @@ void flashing_seizure(void *param)
 void sequential_individual(void *param)
 {
     uint32_t start = pros::millis();
-    leds.clear_all();
+    leftLeds.clear_all();
+    rightLeds.clear_all();
 
     while (true)
     {
         uint32_t current = pros::millis();
         if (current - start > 60000)
         {
-            leds.clear_all();
+            leftLeds.clear_all();
+            rightLeds.clear_all();
             start = current;
         }
         else
         {
-            leds[(current - start) / 1000] = 0x0000FF;
-            leds.update();
+            leftLeds[(current - start) / 1000] = 0x0000FF;
+            rightLeds[(current - start) / 1000] = 0x0000FF;
+            leftLeds.update();
+            rightLeds.update();
         }
     }
 }
+*/
 
 void initialize()
 {
@@ -379,7 +386,8 @@ void initialize()
     create_tab_view();
     // lv_example_img_1();
 
-    leds.set_all(ledColors["blue"]);
+    // leftLeds.set_all(0x222222);
+    // rightLeds.set_all(0x222222);
 }
 
 // runs after initialize and before comp switch / field control, e.g. auto selector
@@ -395,9 +403,6 @@ void autonomous()
     std::string title = "Running auto " + std::to_string(selected_auto);
     lv_label_set_text(title_auto, title.c_str());
     lv_obj_align(title_auto, LV_ALIGN_CENTER, 0, 0);
-
-    // leds
-    pros::Task flash_task(sequential_individual);
 
     switch (selected_auto)
     {
@@ -443,7 +448,13 @@ void opcontrol()
         int leftY = log_drive(forward, 3);
         int rightX = log_drive(turn, 3);
 
-        // clamp toggle for double acting piston (still 1 wire signal, one solenoid is inverted)
+        // flip drive direction if l2 holded
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+        {
+            leftY *= -1;
+        }
+
+        // clamp toggle for single acting piston
         (clampExt) ? clamp.set_value(HIGH) : clamp.set_value(LOW);
 
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
@@ -463,28 +474,29 @@ void opcontrol()
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
         {
 
-            // start the rejection process
-            if (wrong_color() && !in_sorting)
-            {
-                sort_start_time = pros::millis();
-                in_sorting = true;
-            }
-            else
-            {
-                intake.move(127); // otherwise move normal
-            }
+            // // start the rejection process
+            // if (wrong_color() && !in_sorting)
+            // {
+            //     sort_start_time = pros::millis();
+            //     in_sorting = true;
+            // }
+            // else
+            // {
+            //     intake.move(127); // otherwise move normal
+            // }
 
-            if (in_sorting && pros::millis() - sort_start_time < stop_duration)
-            {
-                if (pros::millis() - sort_start_time < continue_duration)
-                    intake.move(127);
-                else
-                    intake.move(0);
-            }
-            else
-            {
-                in_sorting = false;
-            }
+            // if (in_sorting && pros::millis() - sort_start_time < stop_duration)
+            // {
+            //     if (pros::millis() - sort_start_time < continue_duration)
+            //         intake.move(127);
+            //     else
+            //         intake.move(0);
+            // }
+            // else
+            // {
+            //     in_sorting = false;
+            // }
+            intake.move(127);
         }
         else
         {
@@ -508,5 +520,6 @@ void disabled()
 {
     create_tab_view();
 
-    leds.set_all(ledColors["blue"]);
+    // leftLeds.set_all(ledColors["blue"]);
+    // rightLeds.set_all(ledColors["blue"]);
 }
