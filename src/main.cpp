@@ -51,6 +51,7 @@ void switch_handler_auto(lv_event_t *e)
     if (code == LV_EVENT_VALUE_CHANGED)
     {
         isBlue = lv_obj_has_state(obj, LV_STATE_CHECKED); // set blue when switch is flipped
+        // std::cout << (isBlue) << std::endl;
     }
 }
 
@@ -75,7 +76,7 @@ void auto_selector(lv_obj_t *parent)
 
     std::vector<lv_obj_t *> auto_buttons(3);
     std::vector<lv_obj_t *> auto_labels(3);
-    std::vector<std::string> auto_names = {"Auto 1", "Auto 2", "Auto 3"};
+    std::vector<std::string> auto_names = {"Auto Far", "Auto Close", "Auto Basic"};
 
     // initialize buttons
     for (int i = 0; i < auto_buttons.size(); i++)
@@ -407,16 +408,16 @@ void autonomous()
     switch (selected_auto)
     {
     case 1:
-        master.set_text(0, 0, "Auto 1            ");
-        auto1();
+        master.set_text(0, 0, "Auto Far            ");
+        auto_far(isBlue);
         break;
     case 2:
-        master.set_text(0, 0, "Auto 2            ");
-        auto2();
+        master.set_text(0, 0, "Auto Close            ");
+        auto_close(isBlue);
         break;
     case 3:
-        master.set_text(0, 0, "Auto 3            ");
-        auto3();
+        master.set_text(0, 0, "Auto Basic            ");
+        auto_basic();
         break;
     default:
         break;
