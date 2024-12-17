@@ -46,3 +46,24 @@ void auto_basic()
     chassis.setPose(0, 0, 0);
     chassis.moveToPose(0, tile, 0, 2000, {.maxSpeed = 70}, false); // move forward one tile
 }
+
+void auto_sam()
+{
+    //auton for far blue
+    chassis.setPose(tile * 2, tile, 90, false);
+    chassis.moveToPose(tile, tile, 90, 2000, {.forwards = false, .maxSpeed = 70}, false);
+    clamp.set_value(HIGH);
+    pros::delay(500);
+    chassis.turnToPoint(tile, tile * 2, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(tile, tile * 2, 0, 2000, {.maxSpeed = 70}, false);
+    intake.move(127);
+    pros::delay(2000);
+    intake.move(0);
+    chassis.moveToPose(tile, tile * 2, 280, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(7, tile * 2, 280, 2000, {.maxSpeed = 70}, false);
+    intake.move(127);
+    pros::delay(2000);
+    intake.move(0);
+
+
+}
