@@ -76,7 +76,7 @@ void auto_selector(lv_obj_t *parent)
 
     std::vector<lv_obj_t *> auto_buttons(3);
     std::vector<lv_obj_t *> auto_labels(3);
-    std::vector<std::string> auto_names = {"Auto Far", "Auto Close", "Auto Basic"};
+    std::vector<std::string> auto_names = {"Auto Far", "Auto Close", "Auto Sam"};
 
     // initialize buttons
     for (int i = 0; i < auto_buttons.size(); i++)

@@ -1,14 +1,14 @@
 // Port 9 may be broken!!
 // Port 11 broken
 
-const int LEFT_FRONT_PORT = -10;
-const int LEFT_MIDDLE_PORT = -20;
-const int LEFT_BACK_PORT = -11;
-const int RIGHT_FRONT_PORT = 15;
-const int RIGHT_MIDDLE_PORT = 14;
-const int RIGHT_BACK_PORT = 16;
-const int IMU_PORT = 17;
-const int INTAKE_PORT = 19;
+const int LEFT_UPPER_PORT = 6;//3
+const int LEFT_BACK_PORT = -7;//-1
+const int LEFT_FRONT_PORT = -8;//-10
+const int RIGHT_UPPER_PORT = -12;//12
+const int RIGHT_BACK_PORT = 18;//-11
+const int RIGHT_FRONT_PORT = 16;//-20
+const int IMU_PORT = 19;
+const int INTAKE_PORT = 12;
 const int OPTICAL_PORT = 12;
 const int VISION_PORT = 0; // TODO: add this
 const char CLAMP_PORT = 'a';
