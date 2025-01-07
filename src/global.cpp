@@ -30,12 +30,16 @@ pros::MotorGroup leftMotors({LEFT_UPPER_PORT, LEFT_BACK_PORT, LEFT_FRONT_PORT}, 
 pros::MotorGroup rightMotors({RIGHT_UPPER_PORT, RIGHT_BACK_PORT, RIGHT_FRONT_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 
 pros::Motor intake(INTAKE_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor ladyBrown(LADY_BROWN, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 pros::Imu imu(IMU_PORT);
 pros::adi::DigitalOut clamp(CLAMP_PORT, LOW);
+pros::adi::DigitalOut leftDoinker(LEFT_DOINKER_PORT, LOW);
+pros::adi::DigitalOut rightDoinker(RIGHT_DOINKER_PORT, LOW);
 pros::Optical optical(OPTICAL_PORT);
 // pros::Vision frontCam(VISION_PORT);
 pros::adi::Ultrasonic backUltra(B_ULTRA_OUT_PORT, B_ULTRA_IN_PORT);
 pros::adi::Ultrasonic leftUltra(L_ULTRA_OUT_PORT, L_ULTRA_IN_PORT);
+pros::adi::AnalogIn potentiometer (POTENTIOMETER_PORT);
 // pros::adi::Led leftLeds(L_LED_PORT, L_LED_LENGTH);
 // pros::adi::Led rightLeds(R_LED_PORT, R_LED_LENGTH);
 

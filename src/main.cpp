@@ -435,11 +435,17 @@ void opcontrol()
 
     bool clampExt = false;
     bool clampLatch = false;
+    //bool rightDoinkerVal = false;
+    //bool leftDoinkerVal = false;
+    bool rightDoinkerExt = false;
+    bool rightDoinkerLatch = false;
+    bool leftDoinkerExt = false;
+    bool leftDoinkerLatch = false;
     uint32_t sort_start_time = pros::millis();
     int continue_duration = 0; // continue belt after rejection start
     int stop_duration = 300;   // stop belt to reject after continue
     bool in_sorting = false;   // start rejection process
-
+    int ladyBrownState = 1;
     while (true)
     {
         // opcontrol_display(); // FIXME: do not update this as often takes too long
@@ -448,6 +454,10 @@ void opcontrol()
         int turn = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         int leftY = log_drive(forward, 3);
         int rightX = log_drive(turn, 3);
+        int ladyBrownVal = potentiometer.get_value();
+        
+
+        std::cout << ladyBrownVal;
 
         // flip drive direction if l2 holded
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
@@ -455,7 +465,7 @@ void opcontrol()
             leftY *= -1;
         }
 
-        // clamp toggle for single acting piston
+        // clamp toggle for single acting piston 
         (clampExt) ? clamp.set_value(HIGH) : clamp.set_value(LOW);
 
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
@@ -512,6 +522,289 @@ void opcontrol()
 
         // move the chassis with arcade drive
         chassis.arcade(leftY, rightX);
+        int default_state = 650;
+        int state1 = 950;
+        int state2 = 1900;
+        int state3 = 2600;
+
+        //y button
+
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
+            intake.move(127);
+            pros::delay(100);
+            intake.move(-127);
+            pros::delay(100);
+            intake.move(127);
+            pros::delay(100);
+            intake.move(-127);
+            pros::delay(100);
+        }
+
+        //ladybrown code
+        
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 1){
+            while (ladyBrownVal < state1){
+                    ladyBrown.move(-50);
+                    pros::delay(10);
+                    ladyBrownVal = potentiometer.get_value();
+                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+                        ladyBrownState = 1;
+                        while (ladyBrownVal > default_state){
+                            ladyBrownVal = potentiometer.get_value();
+                            ladyBrown.move(50);
+                            pros::delay(20);
+                            if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
+                                ladyBrownState = 2;
+                                while (ladyBrownVal > state2){
+                                ladyBrown.move(100);
+                                }
+                            break;
+                            }
+                        }
+                        ladyBrown.move(0);
+                    }
+                    else{
+                        ladyBrownState = 2;
+                        ladyBrown.move(-10);
+                    }
+                }
+                
+        }
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 2){
+            while (ladyBrownVal < state2){
+                    ladyBrown.move(-70);
+                    pros::delay(20);
+                    ladyBrownVal = potentiometer.get_value();
+                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+                        ladyBrownState = 1;
+                        while (ladyBrownVal > default_state){
+                            ladyBrownVal = potentiometer.get_value();
+                            ladyBrown.move(50);
+                            pros::delay(20);
+                        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
+                            ladyBrownState = 2;
+                            while (ladyBrownVal > state2){
+                                ladyBrown.move(100);
+                            }
+                            break;
+                        }
+                        }
+                        ladyBrown.move(0);
+                    }
+                    else{
+                        ladyBrownState = 3;
+                        ladyBrown.move(0);
+                    }
+                } 
+                
+        }
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 3){
+            while (ladyBrownVal < state3){
+                    ladyBrown.move(-127);
+                    pros::delay(20);
+                    ladyBrownVal = potentiometer.get_value();
+                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+                        ladyBrownState = 1;
+                        while (ladyBrownVal > default_state){
+                            ladyBrownVal = potentiometer.get_value();
+                            ladyBrown.move(50);
+                            pros::delay(20);
+                        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
+                            ladyBrownState = 2;
+                            while (ladyBrownVal > state2){
+                                ladyBrown.move(100);
+                            }
+                            break;
+                        }
+                        }
+                        ladyBrown.move(0);
+                    }
+                    else{
+                        ladyBrownState = 4;
+                        ladyBrown.move(20); //20
+                    }
+                }
+                
+        }
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 4){
+            while (ladyBrownVal > default_state){
+                    ladyBrown.move(50);
+                    pros::delay(20);
+                    ladyBrownVal = potentiometer.get_value();
+                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
+                            ladyBrownState = 2;
+                            while (ladyBrownVal > state3){//changed from stage 2 to stage 3 so that the motor doesnt force it into the intake and break it
+                                ladyBrown.move(100);
+                            }
+                            break;
+                    }
+                    else{
+                        ladyBrownState = 1;
+                        ladyBrown.move(0);
+                        }
+            }
+            
+        }
+                
+                
+        
+
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+                        ladyBrownState = 1;
+                        while (ladyBrownVal > 670){
+                        ladyBrownVal = potentiometer.get_value();
+                        ladyBrown.move(50);
+                        pros::delay(20);
+                        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
+                            ladyBrownState = 2;
+                            while (ladyBrownVal > state2){
+                                ladyBrown.move(100);
+                            }
+                            break;
+                        }
+                        }
+                    }
+        
+
+
+
+
+
+        /*if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A)){
+            if (ladyBrownState = 4){
+                while (ladyBrownVal > 621){
+                    ladyBrown.move(50);
+                    pros::delay(20);
+                    ladyBrownVal = potentiometer.get_value();
+                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+                        ladyBrownState = 1;
+                        while (ladyBrownVal > 670){
+                        ladyBrownVal = potentiometer.get_value();
+                        ladyBrown.move(50);
+                        pros::delay(20);
+                        }
+                    }else{ladyBrownState = 1;}
+                }
+                ladyBrown.move(0);
+                
+            }
+        }
+            
+            if (ladyBrownState = 3){
+                while (ladyBrownVal < 3270){
+                    ladyBrown.move(-100);
+                    pros::delay(20);
+                    ladyBrownVal = potentiometer.get_value();
+                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+                        ladyBrownState = 1;
+                        while (ladyBrownVal > 670){
+                        ladyBrownVal = potentiometer.get_value();
+                        ladyBrown.move(50);
+                        pros::delay(20);
+                        }
+                    }else{ladyBrownState = 4;}
+                }
+                ladyBrown.move(0);
+                
+            }
+
+            if (ladyBrownState = 2){
+                while (ladyBrownVal < 2340){
+                    ladyBrown.move(-100);
+                    pros::delay(20);
+                    ladyBrownVal = potentiometer.get_value();
+                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+                        ladyBrownState = 1;
+                        while (ladyBrownVal > 670){
+                        ladyBrownVal = potentiometer.get_value();
+                        ladyBrown.move(50);
+                        pros::delay(20);
+                        }
+                    }else{ladyBrownState = 3;}
+                } 
+                ladyBrown.move(0);
+                
+            }
+
+            if (ladyBrownState = 1){
+                while (ladyBrownVal < 1000){
+                    ladyBrown.move(-50);
+                    pros::delay(10);
+                    ladyBrownVal = potentiometer.get_value();
+                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+                        ladyBrownState = 1;
+                        while (ladyBrownVal > 670){
+                            ladyBrownVal = potentiometer.get_value();
+                            ladyBrown.move(50);
+                            pros::delay(20);
+                        }
+                    }else{}ladyBrownState = 2;
+                }
+                ladyBrown.move(-10);
+                
+            }
+            
+            
+        }
+        
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+                ladyBrownState = 1;
+                while (ladyBrownVal > 670){
+                ladyBrownVal = potentiometer.get_value();
+                ladyBrown.move(50);
+                pros::delay(20);
+            }
+        }
+        */
+        
+        
+        
+
+        //left doinker code (sam)
+        /*if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
+            if(leftDoinkerVal = true){
+                leftDoinkerVal = false;
+            }
+            else {
+                leftDoinkerVal = true;
+            }
+            if (leftDoinkerVal = true){
+                leftDoinker.set_value(HIGH);
+            }
+            if (leftDoinkerVal = false){
+                leftDoinker.set_value(LOW);
+            }
+            
+        }*/
+        // copied clamp code but changed to right doinker warren moore
+        (rightDoinkerExt) ? rightDoinker.set_value(HIGH) : rightDoinker.set_value(LOW);
+
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
+        {
+            if (!rightDoinkerLatch)
+            {
+                rightDoinkerExt = !rightDoinkerExt;
+                rightDoinkerLatch = true;
+            }
+        }
+        else
+        {
+            rightDoinkerLatch = false;
+        }
+        (leftDoinkerExt) ? leftDoinker.set_value(HIGH) : leftDoinker.set_value(LOW);
+
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
+        {
+            if (!leftDoinkerLatch)
+            {
+                leftDoinkerExt = !leftDoinkerExt;
+                leftDoinkerLatch = true;
+            }
+        }
+        else
+        {
+            leftDoinkerLatch = false;
+        }
 
         pros::delay(20);
     }
@@ -523,4 +816,7 @@ void disabled()
 
     // leftLeds.set_all(ledColors["blue"]);
     // rightLeds.set_all(ledColors["blue"]);
+
 }
+
+

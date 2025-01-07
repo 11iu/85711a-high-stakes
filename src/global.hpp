@@ -17,13 +17,17 @@ extern pros::Motor rF;
 extern pros::Motor rM;
 extern pros::Motor rB;
 extern pros::Motor intake;
+extern pros::Motor ladyBrown;
 extern pros::Imu imu;
 extern pros::adi::DigitalOut clamp;
+extern pros::adi::DigitalOut leftDoinker;
+extern pros::adi::DigitalOut rightDoinker;
 extern pros::Optical optical;
 // extern pros::Vision frontCam;
 extern lemlib::Chassis chassis;
 extern pros::adi::Ultrasonic backUltra;
 extern pros::adi::Ultrasonic leftUltra;
+extern pros::adi::AnalogIn potentiometer;
 // extern pros::adi::Led leftLeds;
 // extern pros::adi::Led rightLeds;
 
