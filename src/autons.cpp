@@ -64,3 +64,20 @@ void auto_sam()
 
 
 }
+
+auto_far_yedong() {
+    chassis.setPose(tile * 2.5, tile * 1.5, 90, false);
+    chassis.moveToPose(tile, tile, 45, 2000, {.forwards = false, .maxSpeed = 70}, false);
+    //clamp.set_value(HIGH);
+    chassis.moveToPose(tile, tile * 2, 0, 2000, {.maxSpeed=70}, false);
+    //get first ring
+    //intake.move(127);
+    chassis.moveToPose(tile, tile * 2, 270, 2000, {.forwards = false, .maxSpeed = 70}, false);
+    chassis.moveToPose(tile * 0.2, tile * 1.8, 270, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(tile, tile * 2, 270, 2000, {.forwards = false, .maxSpeed = 70}, false);
+    chassis.moveToPose(tile * 0.2, tile * 2.2, 270, 2000, {.maxSpeed = 70}, false);
+    //do a back and forth manuver for the two rings near the border
+    chassis.moveToPose(tile, tile * 2, 153, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(tile * 2, 0, 153, 2000, {.maxSpeed = 70}, false);
+    //going for the ring at (2,0) last
+}
