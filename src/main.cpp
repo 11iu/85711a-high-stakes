@@ -435,8 +435,8 @@ void opcontrol()
 
     bool clampExt = false;
     bool clampLatch = false;
-    //bool rightDoinkerVal = false;
-    //bool leftDoinkerVal = false;
+    // bool rightDoinkerVal = false;
+    // bool leftDoinkerVal = false;
     bool rightDoinkerExt = false;
     bool rightDoinkerLatch = false;
     bool leftDoinkerExt = false;
@@ -455,7 +455,10 @@ void opcontrol()
         int leftY = log_drive(forward, 3);
         int rightX = log_drive(turn, 3);
         int ladyBrownVal = potentiometer.get_value();
-        
+
+        // harsh fix
+        if (abs(leftY) > 100 && abs(rightX) > 100)
+            rightX *= 0.4;
 
         std::cout << ladyBrownVal;
 
@@ -465,7 +468,7 @@ void opcontrol()
             leftY *= -1;
         }
 
-        // clamp toggle for single acting piston 
+        // clamp toggle for single acting piston
         (clampExt) ? clamp.set_value(HIGH) : clamp.set_value(LOW);
 
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
@@ -509,19 +512,51 @@ void opcontrol()
             // }
             intake.move(127);
         }
+        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) // reverse intake direction
+        {
+            intake.move(-127);
+        }
         else
         {
             intake.move(0);
         }
 
-        // reverse intake direction
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
+        // right doinker RIGHT BTN
+        (rightDoinkerExt) ? rightDoinker.set_value(HIGH) : rightDoinker.set_value(LOW);
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
         {
-            intake.move(-127);
+            if (!rightDoinkerLatch)
+            {
+                rightDoinkerExt = !rightDoinkerExt;
+                rightDoinkerLatch = true;
+            }
+        }
+        else
+        {
+            rightDoinkerLatch = false;
+        }
+
+        // left doinker LEFT BTN
+        (leftDoinkerExt) ? leftDoinker.set_value(HIGH) : leftDoinker.set_value(LOW);
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
+        {
+            if (!leftDoinkerLatch)
+            {
+                leftDoinkerExt = !leftDoinkerExt;
+                leftDoinkerLatch = true;
+            }
+        }
+        else
+        {
+            leftDoinkerLatch = false;
         }
 
         // move the chassis with arcade drive
         chassis.arcade(leftY, rightX);
+
+        // ladybrown down button sets to lb_down, up button sets to lb_transfer, l2 sets to lb_score
+
+        /*
         int default_state = 650;
         int state1 = 950;
         int state2 = 1900;
@@ -541,7 +576,7 @@ void opcontrol()
         }
 
         //ladybrown code
-        
+
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 1){
             while (ladyBrownVal < state1){
                     ladyBrown.move(-50);
@@ -568,7 +603,7 @@ void opcontrol()
                         ladyBrown.move(-10);
                     }
                 }
-                
+
         }
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 2){
             while (ladyBrownVal < state2){
@@ -595,8 +630,8 @@ void opcontrol()
                         ladyBrownState = 3;
                         ladyBrown.move(0);
                     }
-                } 
-                
+                }
+
         }
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 3){
             while (ladyBrownVal < state3){
@@ -624,7 +659,7 @@ void opcontrol()
                         ladyBrown.move(20); //20
                     }
                 }
-                
+
         }
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 4){
             while (ladyBrownVal > default_state){
@@ -643,11 +678,11 @@ void opcontrol()
                         ladyBrown.move(0);
                         }
             }
-            
+
         }
-                
-                
-        
+
+
+
 
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
                         ladyBrownState = 1;
@@ -664,7 +699,7 @@ void opcontrol()
                         }
                         }
                     }
-        
+
 
 
 
@@ -686,10 +721,10 @@ void opcontrol()
                     }else{ladyBrownState = 1;}
                 }
                 ladyBrown.move(0);
-                
+
             }
         }
-            
+
             if (ladyBrownState = 3){
                 while (ladyBrownVal < 3270){
                     ladyBrown.move(-100);
@@ -705,7 +740,7 @@ void opcontrol()
                     }else{ladyBrownState = 4;}
                 }
                 ladyBrown.move(0);
-                
+
             }
 
             if (ladyBrownState = 2){
@@ -721,9 +756,9 @@ void opcontrol()
                         pros::delay(20);
                         }
                     }else{ladyBrownState = 3;}
-                } 
+                }
                 ladyBrown.move(0);
-                
+
             }
 
             if (ladyBrownState = 1){
@@ -741,12 +776,12 @@ void opcontrol()
                     }else{}ladyBrownState = 2;
                 }
                 ladyBrown.move(-10);
-                
+
             }
-            
-            
+
+
         }
-        
+
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
                 ladyBrownState = 1;
                 while (ladyBrownVal > 670){
@@ -756,11 +791,8 @@ void opcontrol()
             }
         }
         */
-        
-        
-        
 
-        //left doinker code (sam)
+        // left doinker code (sam)
         /*if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
             if(leftDoinkerVal = true){
                 leftDoinkerVal = false;
@@ -774,37 +806,8 @@ void opcontrol()
             if (leftDoinkerVal = false){
                 leftDoinker.set_value(LOW);
             }
-            
+
         }*/
-        // copied clamp code but changed to right doinker warren moore
-        (rightDoinkerExt) ? rightDoinker.set_value(HIGH) : rightDoinker.set_value(LOW);
-
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
-        {
-            if (!rightDoinkerLatch)
-            {
-                rightDoinkerExt = !rightDoinkerExt;
-                rightDoinkerLatch = true;
-            }
-        }
-        else
-        {
-            rightDoinkerLatch = false;
-        }
-        (leftDoinkerExt) ? leftDoinker.set_value(HIGH) : leftDoinker.set_value(LOW);
-
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
-        {
-            if (!leftDoinkerLatch)
-            {
-                leftDoinkerExt = !leftDoinkerExt;
-                leftDoinkerLatch = true;
-            }
-        }
-        else
-        {
-            leftDoinkerLatch = false;
-        }
 
         pros::delay(20);
     }
@@ -816,7 +819,4 @@ void disabled()
 
     // leftLeds.set_all(ledColors["blue"]);
     // rightLeds.set_all(ledColors["blue"]);
-
 }
-
-

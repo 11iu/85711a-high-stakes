@@ -31,4 +31,8 @@ extern pros::adi::AnalogIn potentiometer;
 // extern pros::adi::Led leftLeds;
 // extern pros::adi::Led rightLeds;
 
+extern int lb_down;
+extern int lb_transfer;
+extern int lb_score;
+
 #endif
