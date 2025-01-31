@@ -61,6 +61,45 @@ void auto_sam()
     chassis.moveToPose(tile, tile * 2, 280, 2000, {.maxSpeed = 70}, false);
     chassis.moveToPose(7, tile * 2, 280, 2000, {.maxSpeed = 70}, false);
     
+}
 
-
+void auto_skills() {
+    chassis.setPose(-2.5*tile, 0);
+    intake.move(127);
+    chassis.moveToPose(-2*tile, tile, 180, 2000, {.forwards = false,.maxSpeed = 70}, false);
+    clamp.set_value(HIGH);
+    pros::delay(500);
+    chassis.moveToPose(-tile, tile, 270, 1500, {.maxSpeed = 70}, false);
+    chassis.moveToPose(0, 2.5 * tile, 30, 2000, {.maxSpeed = 70}, false);//goes straight to upper ring
+    chassis.moveToPose(-tile, 2 * tile, 0, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(-2.5 * tile, 2 * tile, 270, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(-2 * tile, 2.5 * tile, 45, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(-2.75 * tile,2.75 * tile, 135, 2000, {.forwards = false,.maxSpeed = 70}, false);
+    clamp.set_value(LOW);
+    chassis.moveToPose(-2 * tile, 0, 0, 2000, {.forwards = false,.maxSpeed = 70}, false);
+    chassis.moveToPose(-2 * tile, -tile, 0, 2000, {.forwards = false,.maxSpeed = 70}, false);
+    clamp.set_value(HIGH);
+    pros::delay(500);
+    chassis.moveToPose(-tile, -tile, 90, 1500, {.maxSpeed = 70}, false);
+    chassis.moveToPose(0, -2.5 * tile, 210, 2000, {.maxSpeed = 70}, false);//goes straight to upper ring
+    chassis.moveToPose(-tile, -2 * tile, 180, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(-2.5 * tile, -2 * tile, 90, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(-2 * tile, -2.5 * tile, 225, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(-2.75 * tile, -2.75 * tile, 45, 2000, {.forwards = false,.maxSpeed = 70}, false);
+    clamp.set_value(LOW);
+    chassis.moveToPose(tile, -tile, 75, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(2*tile, 0, 45, 2000, {.forwards = false, .maxSpeed = 70}, false);
+    clamp.set_value(HIGH);
+    pros::delay(500);
+    chassis.moveToPose(tile,tile,315,2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(tile,2*tile,45,2000,{.maxSpeed = 70},false);
+    chassis.moveToPose(2.5 * tile, 2 * tile, 90, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(2 * tile, 2.5 * tile, 135, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPose(2.75 * tile, 2.75 * tile, 45, 2000, {.forwards = false,.maxSpeed = 70}, false);
+    clamp.set_value(LOW);
+    chassis.moveToPose(2.5 * tile, tile, 0, 2000, {,forwards = false, .maxSpeed = 70}, false);
+    clamp.set_value(HIGH);
+    pros::delay(500);
+    chassis.moveToPose(2.75 * tile, -2.75 * tile, 0, 2000, {.forwards = false,.maxSpeed = 70}, false);
+    
 }
