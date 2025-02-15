@@ -44,29 +44,13 @@ void auto_close(bool blue = true)
 void auto_basic()
 {
     chassis.setPose(0, 0, 0);
-    chassis.moveToPose(0, tile, 0, 2000, {.maxSpeed = 70}, false); // move forward one tile
-}
-
-void auto_sam()
-{
-    //auton for far blue
-    chassis.setPose(tile * 2, tile, 90, false);
-    chassis.moveToPose(tile, tile, 90, 2000, {.forwards = false, .maxSpeed = 70}, false);
-    //clamp.set_value(HIGH);
-    pros::delay(500);
-    chassis.moveToPose(tile, tile * 2, 0, 2000, {.maxSpeed = 70}, false);
-    //intake.move(127);   
-    pros::delay(2000);
-    //intake.move(0);
-    chassis.moveToPose(tile, tile * 2, 280, 2000, {.maxSpeed = 70}, false);
-    chassis.moveToPose(7, tile * 2, 280, 2000, {.maxSpeed = 70}, false);
-    
+    chassis.moveToPose(0, tile, 0, 2000, {}, false); // move forward one tile
 }
 
 void auto_skills() {
-    chassis.setPose(-2.5*tile, 0);
+    chassis.setPose(-2.5*tile, 0, 90);
     intake.move(127);
-    chassis.moveToPose(-2*tile, tile, 180, 2000, {.forwards = false,.maxSpeed = 70}, false);
+    chassis.moveToPose(-2*tile, tile, 180, 2000, {.forwards = false, .maxSpeed = 70}, false);
     clamp.set_value(HIGH);
     pros::delay(500);
     chassis.moveToPose(-tile, tile, 270, 1500, {.maxSpeed = 70}, false);
@@ -97,14 +81,14 @@ void auto_skills() {
     chassis.moveToPose(2 * tile, 2.5 * tile, 135, 2000, {.maxSpeed = 70}, false);
     chassis.moveToPose(2.75 * tile, 2.75 * tile, 45, 2000, {.forwards = false,.maxSpeed = 70}, false);
     clamp.set_value(LOW);
-    chassis.moveToPose(2.5 * tile, tile, 0, 2000, {,forwards = false, .maxSpeed = 70}, false);
+    chassis.moveToPose(2.5 * tile, tile, 0, 2000, {.forwards = false, .maxSpeed = 70}, false);
     clamp.set_value(HIGH);
     pros::delay(500);
     chassis.moveToPose(2.75 * tile, -2.75 * tile, 0, 2000, {.forwards = false,.maxSpeed = 70}, false);
     
 }
 
-auto_far_yedong() {
+void auto_far_yedong() {
     chassis.setPose(tile * 2.5, tile * 1.5, 90, false);
     chassis.moveToPose(tile, tile, 45, 2000, {.forwards = false, .maxSpeed = 70}, false);
     clamp.set_value(HIGH);
@@ -124,7 +108,7 @@ auto_far_yedong() {
     chassis.moveToPose(tile, tile * 0.15, 180, 2000, {.maxSpeed = 70}, false);
 }
 
-solo_awp_yedong() {
+void solo_awp_yedong() {
     chassis.setPose(tile * 2.5, -tile * 1.5, 90, false);
     chassis.moveToPose(tile, -tile, 135, 2000, {.forwards = false, .maxSpeed = 70}, false);
     clamp.set_value(HIGH);
@@ -144,7 +128,7 @@ solo_awp_yedong() {
     chassis.moveToPose(tile, tile, 0, 2000, {.forwards = false, .maxSpeed = 70}, false);
     chassis.moveToPose(tile, tile * 2, 0, 2000, {.maxSpeed = 70}, false);
     chassis.moveToPose(tile, tile * 2, 180, 2000, {.maxSpeed = 70}, false);
-    intake.move(0)
+    intake.move(0);
     clamp.set_value(LOW);
     chassis.moveToPose(tile, 0, 180, 2000, {.maxSpeed = 70}, false);
 }

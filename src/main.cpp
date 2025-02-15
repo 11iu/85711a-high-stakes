@@ -74,16 +74,28 @@ void auto_selector(lv_obj_t *parent)
 
     // auto selector buttons horizontally aligned at the bottom
 
-    std::vector<lv_obj_t *> auto_buttons(3);
-    std::vector<lv_obj_t *> auto_labels(3);
-    std::vector<std::string> auto_names = {"Auto Far", "Auto Close", "Auto Sam"};
+    std::vector<lv_obj_t *> auto_buttons(6);
+    std::vector<lv_obj_t *> auto_labels(6);
+    std::vector<std::string> auto_names = {"Auto Far", "Auto Close", "Auto basic", "Auto skills", "Auto Far YY", "Auto awp YY"};
 
-    // initialize buttons
+    // initialize buttons on two rows
     for (int i = 0; i < auto_buttons.size(); i++)
     {
         auto_buttons[i] = lv_btn_create(parent);
         lv_obj_add_event_cb(auto_buttons[i], btn_handler_auto, LV_EVENT_PRESSED, (void *)(i + 1));
-        lv_obj_set_pos(auto_buttons[i], 150 * i + 35, 100);
+        int x_val = 0;
+        int y_val = 0;
+        if (i >= auto_buttons.size() / 2)
+        {
+            x_val = 120 * (i - auto_buttons.size() / 2) + 30;
+            y_val = 140;
+        }
+        else
+        {
+            x_val = 120 * i + 30;
+            y_val = 80;
+        }
+        lv_obj_set_pos(auto_buttons[i], x_val, y_val);
         lv_obj_set_height(auto_buttons[i], LV_SIZE_CONTENT);
         auto_labels[i] = lv_label_create(auto_buttons[i]);
         lv_label_set_text(auto_labels[i], auto_names[i].c_str());
@@ -259,9 +271,9 @@ void sensor_display(lv_obj_t *parent)
 
     // optical hue, sat, bright, proximity | imu heading | battery current, voltage, capacity, temp | encoder position, velocity
     std::vector<int> sensor_values = {(int)optical.get_hue(), (int)optical.get_saturation(), (int)optical.get_brightness(),
-                                      optical.get_proximity(), (int)imu.get_heading(), (int)(pros::battery::get_current() / 10.0),
+                                      optical.get_proximity(), (int)0, (int)(pros::battery::get_current() / 10.0),
                                       (int)(pros::battery::get_voltage() / 10.0), (int)(pros::battery::get_capacity()), (int)(pros::battery::get_temperature() * 10.0),
-                                      (int)lF.get_position(), (int)lF.get_actual_velocity()};
+                                      (int)lF.get_position(), (int)lF.get_actual_velocity()}; // imu get heading changed to zero
 
     for (int i = 0; i < sensor_titles.size() / 2; i++)
     {
@@ -405,21 +417,31 @@ void autonomous()
     lv_label_set_text(title_auto, title.c_str());
     lv_obj_align(title_auto, LV_ALIGN_CENTER, 0, 0);
 
-    switch (selected_auto)
+    switch (selected_auto)  
     {
     case 1:
-        master.set_text(0, 0, "Auto Far            ");
+        master.set_text(0, 0, "Auto Far");
         auto_far(isBlue);
         break;
     case 2:
-        master.set_text(0, 0, "Auto Close            ");
+        master.set_text(0, 0, "Auto Close");
         auto_close(isBlue);
         break;
     case 3:
-        master.set_text(0, 0, "Auto Basic            ");
+        master.set_text(0, 0, "Auto Basic");
         auto_basic();
         break;
-    default:
+    case 4:
+        master.set_text(0, 0, "Auto Skills");
+        auto_skills();
+        break;
+    case 5:
+        master.set_text(0, 0, "Auto Far YY");
+        auto_far_yedong();
+        break;
+    case 6:
+        master.set_text(0, 0, "Auto AWP YY");
+        solo_awp_yedong();
         break;
     }
 }
@@ -454,13 +476,12 @@ void opcontrol()
         int turn = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         int leftY = log_drive(forward, 3);
         int rightX = log_drive(turn, 3);
-        int ladyBrownVal = potentiometer.get_value();
 
-        // harsh fix
-        if (abs(leftY) > 100 && abs(rightX) > 100)
-            rightX *= 0.4;
+        rightX *= 0.75; // slower turning
 
-        std::cout << ladyBrownVal;
+        // int ladyBrownVal = potentiometer.get_value();
+
+        // std::cout << ladyBrownVal;
 
         // flip drive direction if l2 holded
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
@@ -521,6 +542,10 @@ void opcontrol()
             intake.move(0);
         }
 
+        // move the chassis with arcade drive
+        chassis.arcade(leftY, rightX);
+
+        /*
         // right doinker RIGHT BTN
         (rightDoinkerExt) ? rightDoinker.set_value(HIGH) : rightDoinker.set_value(LOW);
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
@@ -551,12 +576,9 @@ void opcontrol()
             leftDoinkerLatch = false;
         }
 
-        // move the chassis with arcade drive
-        chassis.arcade(leftY, rightX);
 
         // ladybrown down button sets to lb_down, up button sets to lb_transfer, l2 sets to lb_score
 
-        /*
         int default_state = 650;
         int state1 = 950;
         int state2 = 1900;
@@ -753,7 +775,7 @@ void opcontrol()
                         while (ladyBrownVal > 670){
                         ladyBrownVal = potentiometer.get_value();
                         ladyBrown.move(50);
-                        pros::delay(20);
+                        pros::delay(20);z
                         }
                     }else{ladyBrownState = 3;}
                 }
