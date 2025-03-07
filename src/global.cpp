@@ -34,6 +34,9 @@ pros::Motor belt(BELT_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::deg
 pros::adi::DigitalOut clamp(CLAMP_PORT, LOW);
 pros::Optical optical(OPTICAL_PORT);
 pros::Imu imu(IMU_PORT);
+pros::adi::Led leftLeds(L_LED_PORT, L_LED_LENGTH);
+pros::adi::Led rightLeds(R_LED_PORT, R_LED_LENGTH);
+
 
 /* UNUSED */
 // pros::Motor ladyBrown(LADY_BROWN, pros::MotorGears::red, pros::MotorEncoderUnits::degrees);
@@ -43,8 +46,6 @@ pros::Imu imu(IMU_PORT);
 // pros::adi::Ultrasonic backUltra(B_ULTRA_OUT_PORT, B_ULTRA_IN_PORT);
 // pros::adi::Ultrasonic leftUltra(L_ULTRA_OUT_PORT, L_ULTRA_IN_PORT);
 // pros::adi::AnalogIn potentiometer(POTENTIOMETER_PORT);
-// pros::adi::Led leftLeds(L_LED_PORT, L_LED_LENGTH);
-// pros::adi::Led rightLeds(R_LED_PORT, R_LED_LENGTH);
 
 lemlib::Drivetrain drivetrain(
     &leftMotors,                // left motor group

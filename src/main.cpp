@@ -398,8 +398,8 @@ void initialize()
     // lvgl auto selector and info display on brain
     // create_tab_view(); // TODO: uncomment when not testing auto
 
-    // leftLeds.set_all(0x222222);
-    // rightLeds.set_all(0x222222);
+    rightLeds.set_all(0x0000FF);
+    leftLeds.set_all(0x0000FF);
 }
 
 // runs after initialize and before comp switch / field control, e.g. auto selector

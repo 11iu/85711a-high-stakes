@@ -26,6 +26,8 @@ extern pros::Optical optical;
 extern pros::Imu imu;
 
 extern lemlib::Chassis chassis;
+extern pros::adi::Led leftLeds;
+extern pros::adi::Led rightLeds;
 
 // extern pros::adi::DigitalOut leftDoinker;
 // extern pros::adi::DigitalOut rightDoinker;
@@ -34,7 +36,5 @@ extern lemlib::Chassis chassis;
 // extern pros::adi::Ultrasonic backUltra;
 // extern pros::adi::Ultrasonic leftUltra;
 // extern pros::adi::AnalogIn potentiometer;
-// extern pros::adi::Led leftLeds;
-// extern pros::adi::Led rightLeds;
 
 #endif
