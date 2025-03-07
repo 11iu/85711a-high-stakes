@@ -1,18 +1,21 @@
-// Port 9 may be broken!!
-// Port 11 broken
+const int LEFT_TOP_PORT = -4;
+const int LEFT_MID_PORT = 2;
+const int LEFT_BOTTOM_PORT = -3;
 
-const int LEFT_REAR_UPPER_PORT = 4;    // 4
-const int LEFT_REAR_LOWER_PORT = -2;   // 2
-const int LEFT_FRONT_PORT = -3;        // 3
-const int RIGHT_REAR_UPPER_PORT = -12; // 12
-const int RIGHT_REAR_LOWER_PORT = 14;  // 11
-const int RIGHT_FRONT_PORT = 16;       // 13
-const int IMU_PORT = 0;
-const int INTAKE_PORT = -10;
-const int OPTICAL_PORT = 0;
-const int LADY_BROWN = 0;
-const int VISION_PORT = 0; // TODO: add this
+const int RIGHT_TOP_PORT = 10;
+const int RIGHT_MID_PORT = -8;
+const int RIGHT_BOTTOM_PORT = 13;
+
+const int INTAKE_PORT = -15;
+const int BELT_PORT = -12;
+
+const int OPTICAL_PORT = 14;
+const int IMU_PORT = 16;
+
 const char CLAMP_PORT = 'a';
+
+/* UNUSED */
+const int VISION_PORT = 0; // TODO: add this
 const char RIGHT_DOINKER_PORT = 0;
 const char LEFT_DOINKER_PORT = 0;
 const char POTENTIOMETER_PORT = 0;

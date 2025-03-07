@@ -119,7 +119,7 @@ void motor_display(lv_obj_t *parent)
     {
         title = lv_label_create(parent);
     }
-    std::vector<std::string> motor_names = {"lF", "lM", "lB", "rF", "rM", "rB", "intake"};
+    std::vector<std::string> motor_names = {"lT", "lM", "lB", "rT", "rM", "rB", "intake"};
     for (int i = 0; i < motor_titles.size(); i++)
     {
         lv_label_set_text(motor_titles[i], motor_names[i].c_str());
@@ -140,7 +140,7 @@ void motor_display(lv_obj_t *parent)
     }
 
     // motor temp labels in decidegree celcius, TODO: make it red if its too high or add a bar
-    std::vector<int> motor_temps = {(int)(lF.get_temperature() * 10), (int)(lM.get_temperature() * 10), (int)(lB.get_temperature() * 10), (int)(rF.get_temperature() * 10), (int)(rM.get_temperature() * 10), (int)(rB.get_temperature() * 10), (int)(intake.get_temperature() * 10)};
+    std::vector<int> motor_temps = {(int)(lT.get_temperature() * 10), (int)(lM.get_temperature() * 10), (int)(lB.get_temperature() * 10), (int)(rT.get_temperature() * 10), (int)(rM.get_temperature() * 10), (int)(rB.get_temperature() * 10), (int)(intake.get_temperature() * 10)};
     std::vector<lv_obj_t *> motor_temp_titles(7);
     for (lv_obj_t *&title : motor_temp_titles)
     {
@@ -156,7 +156,7 @@ void motor_display(lv_obj_t *parent)
     }
 
     // motor voltage in centivolt
-    std::vector<int> motor_voltages = {(int)(lF.get_voltage() / 10.0), (int)(lM.get_voltage() / 10.0), (int)(lB.get_voltage() / 10.0), (int)(rF.get_voltage() / 10.0), (int)(rM.get_voltage() / 10.0), (int)(rB.get_voltage() / 10.0), (int)(intake.get_voltage() / 10.0)};
+    std::vector<int> motor_voltages = {(int)(lT.get_voltage() / 10.0), (int)(lM.get_voltage() / 10.0), (int)(lB.get_voltage() / 10.0), (int)(rT.get_voltage() / 10.0), (int)(rM.get_voltage() / 10.0), (int)(rB.get_voltage() / 10.0), (int)(intake.get_voltage() / 10.0)};
     std::vector<lv_obj_t *> motor_voltage_titles(7);
     for (lv_obj_t *&title : motor_voltage_titles)
     {
@@ -172,7 +172,7 @@ void motor_display(lv_obj_t *parent)
     }
 
     // motor current in centiamp
-    std::vector<int> motor_currents = {(int)(lF.get_current_draw() / 10.0), (int)(lM.get_current_draw() / 10.0), (int)(lB.get_current_draw() / 10.0), (int)(rF.get_current_draw() / 10.0), (int)(rM.get_current_draw() / 10.0), (int)(rB.get_current_draw() / 10.0), (int)(intake.get_current_draw() / 10.0)};
+    std::vector<int> motor_currents = {(int)(lT.get_current_draw() / 10.0), (int)(lM.get_current_draw() / 10.0), (int)(lB.get_current_draw() / 10.0), (int)(rT.get_current_draw() / 10.0), (int)(rM.get_current_draw() / 10.0), (int)(rB.get_current_draw() / 10.0), (int)(intake.get_current_draw() / 10.0)};
     std::vector<lv_obj_t *> motor_current_titles(7);
     for (lv_obj_t *&title : motor_current_titles)
     {
@@ -188,7 +188,7 @@ void motor_display(lv_obj_t *parent)
     }
 
     // motor torque
-    std::vector<int> motor_torques = {(int)lF.get_torque(), (int)lM.get_torque(), (int)lB.get_torque(), (int)rF.get_torque(), (int)rM.get_torque(), (int)rB.get_torque(), (int)intake.get_torque()};
+    std::vector<int> motor_torques = {(int)lT.get_torque(), (int)lM.get_torque(), (int)lB.get_torque(), (int)rT.get_torque(), (int)rM.get_torque(), (int)rB.get_torque(), (int)intake.get_torque()};
     std::vector<lv_obj_t *> motor_torque_titles(7);
     for (lv_obj_t *&title : motor_torque_titles)
     {
@@ -204,7 +204,7 @@ void motor_display(lv_obj_t *parent)
     }
 
     // motor connected
-    std::vector<bool> motor_connected = {lF.is_installed(), lM.is_installed(), lB.is_installed(), rF.is_installed(), rM.is_installed(), rB.is_installed(), intake.is_installed()};
+    std::vector<bool> motor_connected = {lT.is_installed(), lM.is_installed(), lB.is_installed(), rT.is_installed(), rM.is_installed(), rB.is_installed(), intake.is_installed()};
     std::vector<lv_obj_t *> motor_connected_titles(7);
     for (lv_obj_t *&title : motor_connected_titles)
     {
@@ -273,7 +273,7 @@ void sensor_display(lv_obj_t *parent)
     std::vector<int> sensor_values = {(int)optical.get_hue(), (int)optical.get_saturation(), (int)optical.get_brightness(),
                                       optical.get_proximity(), (int)0, (int)(pros::battery::get_current() / 10.0),
                                       (int)(pros::battery::get_voltage() / 10.0), (int)(pros::battery::get_capacity()), (int)(pros::battery::get_temperature() * 10.0),
-                                      (int)lF.get_position(), (int)lF.get_actual_velocity()}; // imu get heading changed to zero
+                                      (int)lT.get_position(), (int)lT.get_actual_velocity()}; // imu get heading changed to zero
 
     for (int i = 0; i < sensor_titles.size() / 2; i++)
     {
@@ -396,8 +396,7 @@ void initialize()
     chassis.calibrate();
 
     // lvgl auto selector and info display on brain
-    create_tab_view();
-    // lv_example_img_1();
+    // create_tab_view(); // TODO: uncomment when not testing auto
 
     // leftLeds.set_all(0x222222);
     // rightLeds.set_all(0x222222);
@@ -410,14 +409,17 @@ void competition_initialize()
 
 void autonomous()
 {
+    auto_skills();
+    /*
     lv_obj_clean(lv_scr_act());
 
     lv_obj_t *title_auto = lv_label_create(lv_scr_act());
-    std::string title = "Running auto " + std::to_string(selected_auto);
+    // std::string title = "Running auto " + std::to_string(selected_auto);
+    std::string title = "RUNNING SKILLS";
     lv_label_set_text(title_auto, title.c_str());
     lv_obj_align(title_auto, LV_ALIGN_CENTER, 0, 0);
 
-    switch (selected_auto)  
+    switch (selected_auto)
     {
     case 1:
         master.set_text(0, 0, "Auto Far");
@@ -444,6 +446,7 @@ void autonomous()
         solo_awp_yedong();
         break;
     }
+    */
 }
 
 // TODO: check if the rejection for red is ok
@@ -457,17 +460,10 @@ void opcontrol()
 
     bool clampExt = false;
     bool clampLatch = false;
-    // bool rightDoinkerVal = false;
-    // bool leftDoinkerVal = false;
-    bool rightDoinkerExt = false;
-    bool rightDoinkerLatch = false;
-    bool leftDoinkerExt = false;
-    bool leftDoinkerLatch = false;
     uint32_t sort_start_time = pros::millis();
     int continue_duration = 0; // continue belt after rejection start
     int stop_duration = 300;   // stop belt to reject after continue
     bool in_sorting = false;   // start rejection process
-    int ladyBrownState = 1;
     while (true)
     {
         // opcontrol_display(); // FIXME: do not update this as often takes too long
@@ -478,10 +474,6 @@ void opcontrol()
         int rightX = log_drive(turn, 3);
 
         rightX *= 0.75; // slower turning
-
-        // int ladyBrownVal = potentiometer.get_value();
-
-        // std::cout << ladyBrownVal;
 
         // flip drive direction if l2 holded
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
@@ -509,327 +501,47 @@ void opcontrol()
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
         {
 
-            // // start the rejection process
-            // if (wrong_color() && !in_sorting)
-            // {
-            //     sort_start_time = pros::millis();
-            //     in_sorting = true;
-            // }
-            // else
-            // {
-            //     intake.move(127); // otherwise move normal
-            // }
+            /*
+            // start the rejection process
+            if (wrong_color() && !in_sorting)
+            {
+                sort_start_time = pros::millis();
+                in_sorting = true;
+            }
+            else
+            {
+                intake.move(127); // otherwise move normal
+            }
 
-            // if (in_sorting && pros::millis() - sort_start_time < stop_duration)
-            // {
-            //     if (pros::millis() - sort_start_time < continue_duration)
-            //         intake.move(127);
-            //     else
-            //         intake.move(0);
-            // }
-            // else
-            // {
-            //     in_sorting = false;
-            // }
+            if (in_sorting && pros::millis() - sort_start_time < stop_duration)
+            {
+                if (pros::millis() - sort_start_time < continue_duration)
+                    intake.move(127);
+                else
+                    intake.move(0);
+            }
+            else
+            {
+                in_sorting = false;
+            }
+            */
+
             intake.move(127);
+            belt.move(127);
         }
         else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) // reverse intake direction
         {
             intake.move(-127);
+            belt.move(-127);
         }
         else
         {
             intake.move(0);
+            belt.move(0);
         }
 
         // move the chassis with arcade drive
         chassis.arcade(leftY, rightX);
-
-        /*
-        // right doinker RIGHT BTN
-        (rightDoinkerExt) ? rightDoinker.set_value(HIGH) : rightDoinker.set_value(LOW);
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
-        {
-            if (!rightDoinkerLatch)
-            {
-                rightDoinkerExt = !rightDoinkerExt;
-                rightDoinkerLatch = true;
-            }
-        }
-        else
-        {
-            rightDoinkerLatch = false;
-        }
-
-        // left doinker LEFT BTN
-        (leftDoinkerExt) ? leftDoinker.set_value(HIGH) : leftDoinker.set_value(LOW);
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
-        {
-            if (!leftDoinkerLatch)
-            {
-                leftDoinkerExt = !leftDoinkerExt;
-                leftDoinkerLatch = true;
-            }
-        }
-        else
-        {
-            leftDoinkerLatch = false;
-        }
-
-
-        // ladybrown down button sets to lb_down, up button sets to lb_transfer, l2 sets to lb_score
-
-        int default_state = 650;
-        int state1 = 950;
-        int state2 = 1900;
-        int state3 = 2600;
-
-        //y button
-
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
-            intake.move(127);
-            pros::delay(100);
-            intake.move(-127);
-            pros::delay(100);
-            intake.move(127);
-            pros::delay(100);
-            intake.move(-127);
-            pros::delay(100);
-        }
-
-        //ladybrown code
-
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 1){
-            while (ladyBrownVal < state1){
-                    ladyBrown.move(-50);
-                    pros::delay(10);
-                    ladyBrownVal = potentiometer.get_value();
-                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-                        ladyBrownState = 1;
-                        while (ladyBrownVal > default_state){
-                            ladyBrownVal = potentiometer.get_value();
-                            ladyBrown.move(50);
-                            pros::delay(20);
-                            if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
-                                ladyBrownState = 2;
-                                while (ladyBrownVal > state2){
-                                ladyBrown.move(100);
-                                }
-                            break;
-                            }
-                        }
-                        ladyBrown.move(0);
-                    }
-                    else{
-                        ladyBrownState = 2;
-                        ladyBrown.move(-10);
-                    }
-                }
-
-        }
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 2){
-            while (ladyBrownVal < state2){
-                    ladyBrown.move(-70);
-                    pros::delay(20);
-                    ladyBrownVal = potentiometer.get_value();
-                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-                        ladyBrownState = 1;
-                        while (ladyBrownVal > default_state){
-                            ladyBrownVal = potentiometer.get_value();
-                            ladyBrown.move(50);
-                            pros::delay(20);
-                        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
-                            ladyBrownState = 2;
-                            while (ladyBrownVal > state2){
-                                ladyBrown.move(100);
-                            }
-                            break;
-                        }
-                        }
-                        ladyBrown.move(0);
-                    }
-                    else{
-                        ladyBrownState = 3;
-                        ladyBrown.move(0);
-                    }
-                }
-
-        }
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 3){
-            while (ladyBrownVal < state3){
-                    ladyBrown.move(-127);
-                    pros::delay(20);
-                    ladyBrownVal = potentiometer.get_value();
-                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-                        ladyBrownState = 1;
-                        while (ladyBrownVal > default_state){
-                            ladyBrownVal = potentiometer.get_value();
-                            ladyBrown.move(50);
-                            pros::delay(20);
-                        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
-                            ladyBrownState = 2;
-                            while (ladyBrownVal > state2){
-                                ladyBrown.move(100);
-                            }
-                            break;
-                        }
-                        }
-                        ladyBrown.move(0);
-                    }
-                    else{
-                        ladyBrownState = 4;
-                        ladyBrown.move(20); //20
-                    }
-                }
-
-        }
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A) && ladyBrownState == 4){
-            while (ladyBrownVal > default_state){
-                    ladyBrown.move(50);
-                    pros::delay(20);
-                    ladyBrownVal = potentiometer.get_value();
-                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
-                            ladyBrownState = 2;
-                            while (ladyBrownVal > state3){//changed from stage 2 to stage 3 so that the motor doesnt force it into the intake and break it
-                                ladyBrown.move(100);
-                            }
-                            break;
-                    }
-                    else{
-                        ladyBrownState = 1;
-                        ladyBrown.move(0);
-                        }
-            }
-
-        }
-
-
-
-
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-                        ladyBrownState = 1;
-                        while (ladyBrownVal > 670){
-                        ladyBrownVal = potentiometer.get_value();
-                        ladyBrown.move(50);
-                        pros::delay(20);
-                        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
-                            ladyBrownState = 2;
-                            while (ladyBrownVal > state2){
-                                ladyBrown.move(100);
-                            }
-                            break;
-                        }
-                        }
-                    }
-
-
-
-
-
-
-        /*if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A)){
-            if (ladyBrownState = 4){
-                while (ladyBrownVal > 621){
-                    ladyBrown.move(50);
-                    pros::delay(20);
-                    ladyBrownVal = potentiometer.get_value();
-                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-                        ladyBrownState = 1;
-                        while (ladyBrownVal > 670){
-                        ladyBrownVal = potentiometer.get_value();
-                        ladyBrown.move(50);
-                        pros::delay(20);
-                        }
-                    }else{ladyBrownState = 1;}
-                }
-                ladyBrown.move(0);
-
-            }
-        }
-
-            if (ladyBrownState = 3){
-                while (ladyBrownVal < 3270){
-                    ladyBrown.move(-100);
-                    pros::delay(20);
-                    ladyBrownVal = potentiometer.get_value();
-                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-                        ladyBrownState = 1;
-                        while (ladyBrownVal > 670){
-                        ladyBrownVal = potentiometer.get_value();
-                        ladyBrown.move(50);
-                        pros::delay(20);
-                        }
-                    }else{ladyBrownState = 4;}
-                }
-                ladyBrown.move(0);
-
-            }
-
-            if (ladyBrownState = 2){
-                while (ladyBrownVal < 2340){
-                    ladyBrown.move(-100);
-                    pros::delay(20);
-                    ladyBrownVal = potentiometer.get_value();
-                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-                        ladyBrownState = 1;
-                        while (ladyBrownVal > 670){
-                        ladyBrownVal = potentiometer.get_value();
-                        ladyBrown.move(50);
-                        pros::delay(20);z
-                        }
-                    }else{ladyBrownState = 3;}
-                }
-                ladyBrown.move(0);
-
-            }
-
-            if (ladyBrownState = 1){
-                while (ladyBrownVal < 1000){
-                    ladyBrown.move(-50);
-                    pros::delay(10);
-                    ladyBrownVal = potentiometer.get_value();
-                    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-                        ladyBrownState = 1;
-                        while (ladyBrownVal > 670){
-                            ladyBrownVal = potentiometer.get_value();
-                            ladyBrown.move(50);
-                            pros::delay(20);
-                        }
-                    }else{}ladyBrownState = 2;
-                }
-                ladyBrown.move(-10);
-
-            }
-
-
-        }
-
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-                ladyBrownState = 1;
-                while (ladyBrownVal > 670){
-                ladyBrownVal = potentiometer.get_value();
-                ladyBrown.move(50);
-                pros::delay(20);
-            }
-        }
-        */
-
-        // left doinker code (sam)
-        /*if (master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
-            if(leftDoinkerVal = true){
-                leftDoinkerVal = false;
-            }
-            else {
-                leftDoinkerVal = true;
-            }
-            if (leftDoinkerVal = true){
-                leftDoinker.set_value(HIGH);
-            }
-            if (leftDoinkerVal = false){
-                leftDoinker.set_value(LOW);
-            }
-
-        }*/
 
         pros::delay(20);
     }

@@ -19,23 +19,26 @@ bool isBlue = false;
 // Objects
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-pros::Motor lF(LEFT_REAR_UPPER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::Motor lM(LEFT_REAR_LOWER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::Motor lB(LEFT_FRONT_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::Motor rF(RIGHT_REAR_UPPER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::Motor rM(RIGHT_REAR_LOWER_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::Motor rB(RIGHT_FRONT_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor lT(LEFT_TOP_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor lM(LEFT_BOTTOM_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor lB(LEFT_MID_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor rT(RIGHT_TOP_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor rM(RIGHT_BOTTOM_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::Motor rB(RIGHT_MID_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 
-pros::MotorGroup leftMotors({LEFT_REAR_UPPER_PORT, LEFT_REAR_LOWER_PORT, LEFT_FRONT_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-pros::MotorGroup rightMotors({RIGHT_REAR_UPPER_PORT, RIGHT_REAR_LOWER_PORT, RIGHT_FRONT_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::MotorGroup leftMotors({LEFT_TOP_PORT, LEFT_BOTTOM_PORT, LEFT_MID_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
+pros::MotorGroup rightMotors({RIGHT_TOP_PORT, RIGHT_BOTTOM_PORT, RIGHT_MID_PORT}, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 
 pros::Motor intake(INTAKE_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
-// pros::Motor ladyBrown(LADY_BROWN, pros::MotorGears::red, pros::MotorEncoderUnits::degrees);
-pros::Imu imu(IMU_PORT);
+pros::Motor belt(BELT_PORT, pros::MotorGears::blue, pros::MotorEncoderUnits::degrees);
 pros::adi::DigitalOut clamp(CLAMP_PORT, LOW);
+pros::Optical optical(OPTICAL_PORT);
+pros::Imu imu(IMU_PORT);
+
+/* UNUSED */
+// pros::Motor ladyBrown(LADY_BROWN, pros::MotorGears::red, pros::MotorEncoderUnits::degrees);
 // pros::adi::DigitalOut leftDoinker(LEFT_DOINKER_PORT, LOW);
 // pros::adi::DigitalOut rightDoinker(RIGHT_DOINKER_PORT, LOW);
-pros::Optical optical(OPTICAL_PORT);
 // pros::Vision frontCam(VISION_PORT);
 // pros::adi::Ultrasonic backUltra(B_ULTRA_OUT_PORT, B_ULTRA_IN_PORT);
 // pros::adi::Ultrasonic leftUltra(L_ULTRA_OUT_PORT, L_ULTRA_IN_PORT);
@@ -49,25 +52,25 @@ lemlib::Drivetrain drivetrain(
     10.75,                      // 12 inch track width (left to right wheels), 10/75
     lemlib::Omniwheel::NEW_325, // using new 3.25" omnis
     400,                        // drivetrain rpm is 400
-    8                           // chase power is 2. If we had traction wheels, it would have been 8
+    2                           // chase power is 2. If we had traction wheels, it would have been 8
 );
 
 lemlib::ControllerSettings
-    linearController(30,  // proportional gain (kP), 30 works
+    linearController(60,  // proportional gain (kP), 60 works
                      0,   // integral gain (kI), 0 works
-                     4,   // derivative gain (kD), 4 works
+                     1,   // derivative gain (kD), 0.1 works
                      3,   // anti windup
                      1,   // small error range, in inches
                      100, // small error range timeout, in milliseconds
                      3,   // large error range, in inches
                      500, // large error range timeout, in milliseconds
-                     40   // maximum acceleration (slew), 40 works
+                     20   // maximum acceleration (slew), 20 works
     );
 
 lemlib::ControllerSettings
-    angularController(4,   // proportional gain (kP) 3 works
+    angularController(3,   // proportional gain (kP) 3 works
                       0,   // integral gain (kI)
-                      20,  // derivative gain (kD) 15 works
+                      10,  // derivative gain (kD) 15 works
                       3,   // anti windup
                       1,   // small error range, in degrees
                       100, // small error range timeout, in milliseconds
@@ -88,7 +91,3 @@ lemlib::OdomSensors sensors(
 lemlib::Chassis chassis(drivetrain, linearController, angularController,
                         sensors);
 
-// TODO: change these to actual values
-int lb_down = 200;
-int lb_transfer = 400;
-int lb_score = 600;
